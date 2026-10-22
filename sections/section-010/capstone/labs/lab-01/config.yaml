@@ -1,0 +1,51 @@
+# Repair An Onboarding Script That Breaks In CI
+# Astrona graded capstone. Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-capstone-010"
+  docs:
+    guide: "solution.md"
+    solution: "solution.md"
+    question: "question.md"
+    examQuestion: "question.md"
+    prerequisites: "prerequisites.md"
+
+bootstrap:
+  init:
+    - name: "install-harbor"
+      description: "Installs Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, and signs the harbor CLI in"
+      type: "file"
+      source: "bootstrap/01-install-harbor.sh"
+    - name: "ats-104-capstone-010-setup"
+      description: "Creates team-red and red-dev, and writes /work/teams.csv and the broken /work/onboard-teams.sh"
+      type: "file"
+      source: "bootstrap/02-seed-state.sh"
+
+testing:
+  init:
+    - name: "wait-for-harbor"
+      description: "Waits until every Harbor component reports healthy and the pods are ready"
+      type: "file"
+      source: "testing/wait-for-harbor.sh"
+    - name: "reference-solution"
+      description: "The remediation a correct learner performs; used by `astrona test`"
+      type: "file"
+      source: "solution/apply.sh"
+
+validation:
+  scripts:
+    - name: "validate-no-password-in-script"
+      description: "Confirms the script reads the administrator password from HARBOR_PASSWORD through stdin"
+      type: "file"
+      source: "validation/validate-no-password-in-script.sh"
+    - name: "validate-runs-twice"
+      description: "Runs the script twice the way CI does and checks both runs succeed"
+      type: "file"
+      source: "validation/validate-runs-twice.sh"
+    - name: "validate-every-team"
+      description: "Confirms every team in teams.csv is a private project with exactly one Developer member"
+      type: "file"
+      source: "validation/validate-every-team.sh"
+
+teardown:
+  keepCluster: false

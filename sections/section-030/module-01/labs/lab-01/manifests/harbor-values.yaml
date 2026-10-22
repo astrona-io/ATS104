@@ -1,0 +1,26 @@
+# Helm values for Harbor 2.15.4 (chart harbor-helm 1.19.4) in every ATS100
+# environment. One address everywhere: https://harbor.localtest.me:8443.
+# Inside the cluster a CoreDNS rewrite sends that name to the Service
+# `harbor`; on the reader's machine a port-forward of port 8443 does.
+expose:
+  type: clusterIP
+  tls:
+    enabled: true
+    certSource: auto
+    auto:
+      commonName: harbor.localtest.me
+  clusterIP:
+    name: harbor
+    ports:
+      httpPort: 8080
+      httpsPort: 8443
+externalURL: https://harbor.localtest.me:8443
+# Lab-only administrator password. A real installation sets its own.
+harborAdminPassword: Harbor12345
+# Lab environments are thrown away: no PersistentVolumeClaims.
+persistence:
+  enabled: false
+trivy:
+  enabled: true
+metrics:
+  enabled: false

@@ -1,0 +1,55 @@
+# Write An Idempotent Onboarding Script
+# Astrona graded lab. Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-lab-010-01"
+  docs:
+    guide: "solution.md"
+    solution: "solution.md"
+    question: "question.md"
+    examQuestion: "question.md"
+    prerequisites: "prerequisites.md"
+
+bootstrap:
+  init:
+    - name: "install-harbor"
+      description: "Installs Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, and signs the harbor CLI in"
+      type: "file"
+      source: "bootstrap/01-install-harbor.sh"
+    - name: "ats-104-lab-010-01-setup"
+      description: "Creates the project team-red with the user red-dev as a Developer, as if an earlier onboarding had run"
+      type: "file"
+      source: "bootstrap/02-seed-state.sh"
+
+testing:
+  init:
+    - name: "wait-for-harbor"
+      description: "Waits until every Harbor component reports healthy and the pods are ready"
+      type: "file"
+      source: "testing/wait-for-harbor.sh"
+    - name: "reference-solution"
+      description: "The remediation a correct learner performs; used by `astrona test`"
+      type: "file"
+      source: "solution/apply.sh"
+
+validation:
+  scripts:
+    - name: "validate-script-uses-cli"
+      description: "Confirms /work/onboard.sh exists and uses the harbor CLI, not curl"
+      type: "file"
+      source: "validation/validate-script-uses-cli.sh"
+    - name: "validate-first-run"
+      description: "Runs the script for team-blue and checks the project, the user and the Developer membership"
+      type: "file"
+      source: "validation/validate-first-run.sh"
+    - name: "validate-second-run"
+      description: "Runs the script again and checks it succeeds without duplicating anything"
+      type: "file"
+      source: "validation/validate-second-run.sh"
+    - name: "validate-existing-team"
+      description: "Runs the script for the existing team-red and checks nothing breaks"
+      type: "file"
+      source: "validation/validate-existing-team.sh"
+
+teardown:
+  keepCluster: false

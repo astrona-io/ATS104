@@ -1,0 +1,334 @@
+# Course manifest for ATS104 - Harbor CLI Automation, REST API & Webhooks (Harbor).
+#
+# One entry per section under `modules:`. Each section lists, in order: its
+# README, then for each module the landing page (course.md), its parts
+# (course-0N-*.md), and right after the part a lab tests, the lab's
+# question.md reading and the `type: lab` entry. The module's summary page
+# comes last. The section capstone closes the section. Playgrounds are not
+# listed: the landing page's playground marker shows them. solution.md is
+# never listed.
+#
+# Every `path:` is relative to this file.
+
+training:
+  id: ATS104
+  title: "Harbor: Harbor CLI Automation, REST API & Webhooks"
+  maturity: draft
+  description: >
+    Training material covering the Harbor CLI Automation, REST API & Webhooks
+    domain of the Harbor training path: scripting Harbor with the harbor
+    command-line tool so a script can run twice, the REST API v2.0 with
+    authentication, pagination and filters, Python automation with the
+    standard library, robot accounts with the smallest set of permissions and
+    secret rotation, and webhook policies that notify CI pipelines. Each
+    module pairs a layered reader with an ungraded hands-on playground and a
+    graded practice lab. Each section closes with an integration capstone.
+    Written for Harbor v2.15.4 and the Harbor CLI v0.0.27.
+
+  certification:
+    name: Harbor
+    code: HARBOR
+    provider: Astrona
+    domain: Harbor CLI Automation, REST API & Webhooks
+    weight: 15
+
+modules:
+
+  - id: module-intro
+    title: "Introduction"
+    description: >
+      Start here. What this course trains you to do, how it is laid out, how
+      to get your machine ready with the astrona command-line tool, how the
+      content is written and checked, who maintains it, and how to report a
+      mistake.
+
+    content:
+      - type: reading
+        title: Introduction
+        path: sections/intro/README.md
+      - type: reading
+        title: "Welcome To The Course"
+        path: sections/intro/course-01-welcome.md
+      - type: reading
+        title: "Get Your Machine Ready"
+        path: sections/intro/course-02-get-your-machine-ready.md
+      - type: reading
+        title: "How This Course Is Made"
+        path: sections/intro/course-03-how-this-course-is-made.md
+
+  - id: module-010
+    title: "Automating Harbor With The harbor CLI"
+    description: >
+      The harbor command-line tool inside scripts: signing in without a
+      prompt, contexts and the encryption key, JSON output, exit codes, and
+      an onboarding script that creates only what is missing, so it can run
+      again safely.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-010/README.md
+
+      - type: reading
+        title: "Script Harbor With The harbor CLI"
+        path: sections/section-010/module-01/course.md
+      - type: reading
+        title: "The harbor CLI In A Script"
+        path: sections/section-010/module-01/course-01-the-cli-in-a-script.md
+      - type: reading
+        title: "An Onboarding Script That Can Run Twice"
+        path: sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Write An Idempotent Onboarding Script Lab"
+        path: sections/section-010/module-01/labs/lab-01
+        difficulty: beginner
+        estimated_duration: 20m
+        topic: cli-automation
+        task_kind: build
+        tags: [harbor-cli, idempotency, output-json, users, project-members, ci-without-tty]
+        learning_goals:
+          - Write a shell script that creates a project, a user and a membership with the harbor CLI only when they are missing
+          - Find out whether an object exists from a command's exit code or its JSON output
+          - Prove the script is idempotent by running it twice without a terminal
+        resources:
+          - name: "Harbor CLI documentation"
+            url: https://goharbor.io/cli-docs/
+          - name: "harbor project member create"
+            url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-project-member-create.md
+          - name: "Assign users to a project"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/create-projects/add-users/
+      - type: reading
+        title: Summary
+        path: sections/section-010/module-01/course-03-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-010/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Repair An Onboarding Script That Breaks In CI Capstone"
+        path: sections/section-010/capstone/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 35m
+        topic: cli-automation
+        task_kind: troubleshooting
+        tags: [harbor-cli, password-stdin, ci-without-tty, idempotency, cli-context, project-members]
+        learning_goals:
+          - Find why a CLI script hangs, fails on a second run and onboards the wrong number of teams when it runs without a terminal
+          - Remove the hard-coded password and sign the CLI in with --password-stdin
+          - Prove the script onboards every team privately and can run twice
+        resources:
+          - name: "Harbor CLI config management"
+            url: https://goharbor.io/cli-docs/cli-config/
+          - name: "Harbor CLI encryption"
+            url: https://goharbor.io/cli-docs/cli-encryption/
+          - name: "harbor login"
+            url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-login.md
+
+  - id: module-020
+    title: "The Harbor REST API v2.0"
+    description: >
+      Harbor's REST API: the base path, basic authentication, the error
+      format, pages and page sizes, the q filter and sorting, and a Python
+      script built only on the standard library that reads every page.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-020/README.md
+
+      - type: reading
+        title: "Call The Harbor REST API"
+        path: sections/section-020/module-01/course.md
+      - type: reading
+        title: "Base Path, Authentication And Errors"
+        path: sections/section-020/module-01/course-01-base-path-authentication-and-errors.md
+      - type: reading
+        title: "Pages, Filters And Sorting"
+        path: sections/section-020/module-01/course-02-pages-filters-and-sorting.md
+      - type: reading
+        title: "A Python Script With The Standard Library"
+        path: sections/section-020/module-01/course-03-a-python-script-with-the-standard-library.md
+      - type: reading
+        title: Question
+        path: sections/section-020/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Report Every Repository In A Project Lab"
+        path: sections/section-020/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: rest-api
+        task_kind: build
+        tags: [rest-api, basic-auth, pagination, python-urllib, tls-verification]
+        learning_goals:
+          - Call the Harbor REST API from Python with basic authentication and TLS verification on
+          - Read every page of a list endpoint with page, page_size and X-Total-Count
+          - Prove the report matches what the API says for two projects
+        resources:
+          - name: "Harbor REST API (swagger.yaml, v2.15.4)"
+            url: https://github.com/goharbor/harbor/blob/v2.15.4/api/v2.0/swagger.yaml
+          - name: "Working with images, tags and artifacts"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/working-with-images/
+      - type: reading
+        title: Summary
+        path: sections/section-020/module-01/course-04-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-020/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Remove Untagged Artifacts Through The API Capstone"
+        path: sections/section-020/capstone/labs/lab-01
+        difficulty: advanced
+        estimated_duration: 35m
+        topic: rest-api
+        task_kind: troubleshooting
+        tags: [rest-api, pagination, untagged-artifacts, python-urllib, tls-verification]
+        learning_goals:
+          - Find why a cleanup script deletes nothing, skips pages and would touch other projects
+          - Fix the script so it deletes only untagged artifacts of the project it is given, with TLS verification on
+          - Prove every tag survives, the other project is untouched and a second run succeeds
+        resources:
+          - name: "Harbor REST API (swagger.yaml, v2.15.4)"
+            url: https://github.com/goharbor/harbor/blob/v2.15.4/api/v2.0/swagger.yaml
+          - name: "Working with images, tags and artifacts"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/working-with-images/
+
+  - id: module-030
+    title: "Robot Accounts For CI"
+    description: >
+      Robot accounts as the credentials for pipelines: project and system
+      robots, the robot$ name format, permissions as resource and action,
+      expiry, refreshing a secret, and storing the secret in a Kubernetes
+      Secret with the smallest set of permissions that works.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-030/README.md
+
+      - type: reading
+        title: "Give CI Its Own Credentials With Robot Accounts"
+        path: sections/section-030/module-01/course.md
+      - type: reading
+        title: "Project Robots And System Robots"
+        path: sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+      - type: reading
+        title: "Least Privilege, Expiry And Rotation"
+        path: sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - type: reading
+        title: Question
+        path: sections/section-030/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Create A Push-Only Robot For CI Lab"
+        path: sections/section-030/module-01/labs/lab-01
+        difficulty: beginner
+        estimated_duration: 20m
+        topic: robot-accounts
+        task_kind: build
+        tags: [robot-account, project-robot, robot-permissions, least-privilege, kubernetes-secret, oras]
+        learning_goals:
+          - Create a project robot with only repository push and pull and a 30-day expiry
+          - Store the robot's name and secret in a Kubernetes Secret
+          - Prove the robot can push to its own project and nowhere else
+        resources:
+          - name: "Create project robot accounts"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/create-robot-accounts/
+          - name: "Robot accounts (system level)"
+            url: https://goharbor.io/docs/2.15.0/administration/robot-accounts/
+          - name: "harbor project robot create"
+            url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-project-robot-create.md
+      - type: reading
+        title: Summary
+        path: sections/section-030/module-01/course-03-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-030/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Rotate A Leaked Robot Secret Capstone"
+        path: sections/section-030/capstone/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: robot-accounts
+        task_kind: troubleshooting
+        tags: [robot-account, secret-rotation, least-privilege, robot-permissions, kubernetes-secret, oras]
+        learning_goals:
+          - Refresh a leaked robot secret so the old one stops working
+          - Reduce an over-privileged robot to pull only, with an expiry, without recreating it
+          - Prove the new secret pulls, a push is refused and the leaked secret is dead
+        resources:
+          - name: "Create project robot accounts"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/create-robot-accounts/
+          - name: "Robot accounts (system level)"
+            url: https://goharbor.io/docs/2.15.0/administration/robot-accounts/
+          - name: "harbor project robot refresh"
+            url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-project-robot-refresh.md
+
+  - id: module-040
+    title: "Webhooks For Pipelines"
+    description: >
+      Webhook policies that call a CI pipeline when something happens in a
+      project: event types, the Default and CloudEvents payloads, the auth
+      header, delivery by jobservice with retries, the execution log, and how
+      GitHub Actions and Jenkins receive the call.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-040/README.md
+
+      - type: reading
+        title: "Trigger Pipelines With Harbor Webhooks"
+        path: sections/section-040/module-01/course.md
+      - type: reading
+        title: "Webhook Policies And Payloads"
+        path: sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+      - type: reading
+        title: "Delivery, Retries And CI Integration"
+        path: sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - type: reading
+        title: Question
+        path: sections/section-040/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Notify A Pipeline When An Artifact Is Pushed Lab"
+        path: sections/section-040/module-01/labs/lab-01
+        difficulty: beginner
+        estimated_duration: 20m
+        topic: webhooks
+        task_kind: build
+        tags: [webhook-policy, push-artifact, payload-format, auth-header, jobservice, oras]
+        learning_goals:
+          - Create a webhook policy for PUSH_ARTIFACT events with an auth header
+          - Prove delivery by pushing an artifact and finding the event in the receiver log
+        resources:
+          - name: "Configure webhook notifications"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/configure-webhooks/
+          - name: "harbor webhook create"
+            url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-webhook-create.md
+      - type: reading
+        title: Summary
+        path: sections/section-040/module-01/course-03-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-040/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Bootstrap A CI Project End To End Capstone"
+        path: sections/section-040/capstone/labs/lab-01
+        difficulty: advanced
+        estimated_duration: 40m
+        topic: webhooks
+        task_kind: troubleshooting
+        tags: [webhook-policy, cloudevents, auth-header, robot-permissions, robot-account, jobservice]
+        learning_goals:
+          - Find why a CI robot cannot push and why the pipeline never hears about pushes
+          - Fix the robot and the webhook policy in place, with CloudEvents payloads
+          - Prove a push by the robot reaches the receiver as a CloudEvent with the auth header
+        resources:
+          - name: "Configure webhook notifications"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/configure-webhooks/
+          - name: "Create project robot accounts"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/create-robot-accounts/

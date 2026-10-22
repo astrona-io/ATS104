@@ -1,0 +1,47 @@
+# Notify A Pipeline When An Artifact Is Pushed
+# Astrona graded lab. Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-lab-040-01"
+  docs:
+    guide: "solution.md"
+    solution: "solution.md"
+    question: "question.md"
+    examQuestion: "question.md"
+    prerequisites: "prerequisites.md"
+
+bootstrap:
+  init:
+    - name: "install-harbor"
+      description: "Installs Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, and signs the harbor CLI in"
+      type: "file"
+      source: "bootstrap/01-install-harbor.sh"
+    - name: "ats-104-lab-040-01-setup"
+      description: "Creates the project inventory with one artifact; the webhook receiver runs in the namespace hooks"
+      type: "file"
+      source: "bootstrap/02-seed-state.sh"
+
+testing:
+  init:
+    - name: "wait-for-harbor"
+      description: "Waits until every Harbor component reports healthy and the pods are ready"
+      type: "file"
+      source: "testing/wait-for-harbor.sh"
+    - name: "reference-solution"
+      description: "The remediation a correct learner performs; used by `astrona test`"
+      type: "file"
+      source: "solution/apply.sh"
+
+validation:
+  scripts:
+    - name: "validate-policy"
+      description: "Confirms the webhook policy notify-ci matches the task"
+      type: "file"
+      source: "validation/validate-policy.sh"
+    - name: "validate-delivery"
+      description: "Pushes an artifact and waits for the receiver to log the event with the auth header"
+      type: "file"
+      source: "validation/validate-delivery.sh"
+
+teardown:
+  keepCluster: false

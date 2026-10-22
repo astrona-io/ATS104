@@ -1,0 +1,51 @@
+# Bootstrap A CI Project End To End
+# Astrona graded capstone. Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-capstone-040"
+  docs:
+    guide: "solution.md"
+    solution: "solution.md"
+    question: "question.md"
+    examQuestion: "question.md"
+    prerequisites: "prerequisites.md"
+
+bootstrap:
+  init:
+    - name: "install-harbor"
+      description: "Installs Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, and signs the harbor CLI in"
+      type: "file"
+      source: "bootstrap/01-install-harbor.sh"
+    - name: "ats-104-capstone-040-setup"
+      description: "Creates the project ci with a pull-only robot builder and a broken webhook policy notify-ci"
+      type: "file"
+      source: "bootstrap/02-seed-state.sh"
+
+testing:
+  init:
+    - name: "wait-for-harbor"
+      description: "Waits until every Harbor component reports healthy and the pods are ready"
+      type: "file"
+      source: "testing/wait-for-harbor.sh"
+    - name: "reference-solution"
+      description: "The remediation a correct learner performs; used by `astrona test`"
+      type: "file"
+      source: "solution/apply.sh"
+
+validation:
+  scripts:
+    - name: "validate-same-objects"
+      description: "Confirms the robot and the webhook policy were changed in place, not recreated"
+      type: "file"
+      source: "validation/validate-same-objects.sh"
+    - name: "validate-policy"
+      description: "Confirms notify-ci is enabled, sends PUSH_ARTIFACT only and uses CloudEvents"
+      type: "file"
+      source: "validation/validate-policy.sh"
+    - name: "validate-ci-push-notifies"
+      description: "Pushes to ci as the robot and waits for a CloudEvents webhook with the auth header"
+      type: "file"
+      source: "validation/validate-ci-push-notifies.sh"
+
+teardown:
+  keepCluster: false

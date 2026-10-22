@@ -1,0 +1,24 @@
+# Give CI Its Own Credentials With Robot Accounts (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-playground-030-01"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, sign the harbor CLI in, then: Creates the projects ci and inventory, with one artifact in inventory."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests:
+    - name: "lab-start"
+      description: "The workstation pod (client tools, Harbor's CA trusted) and the webhook receiver echo."
+      type: "file"
+      source: "manifests/lab-start.yaml"
+
+teardown:
+  keepCluster: false

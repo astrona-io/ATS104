@@ -1,0 +1,55 @@
+# Remove Untagged Artifacts Through The API
+# Astrona graded capstone. Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-capstone-020"
+  docs:
+    guide: "solution.md"
+    solution: "solution.md"
+    question: "question.md"
+    examQuestion: "question.md"
+    prerequisites: "prerequisites.md"
+
+bootstrap:
+  init:
+    - name: "install-harbor"
+      description: "Installs Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, and signs the harbor CLI in"
+      type: "file"
+      source: "bootstrap/01-install-harbor.sh"
+    - name: "ats-104-capstone-020-setup"
+      description: "Pushes tagged and untagged artifacts into inventory and archive, and writes the broken /work/cleanup.py"
+      type: "file"
+      source: "bootstrap/02-seed-state.sh"
+
+testing:
+  init:
+    - name: "wait-for-harbor"
+      description: "Waits until every Harbor component reports healthy and the pods are ready"
+      type: "file"
+      source: "testing/wait-for-harbor.sh"
+    - name: "reference-solution"
+      description: "The remediation a correct learner performs; used by `astrona test`"
+      type: "file"
+      source: "solution/apply.sh"
+
+validation:
+  scripts:
+    - name: "validate-script-is-safe"
+      description: "Confirms cleanup.py keeps TLS verification on and holds no password"
+      type: "file"
+      source: "validation/validate-script-is-safe.sh"
+    - name: "validate-inventory-clean"
+      description: "Confirms inventory has no untagged artifacts and every tag is still there"
+      type: "file"
+      source: "validation/validate-inventory-clean.sh"
+    - name: "validate-archive-untouched"
+      description: "Confirms the project archive still has both of its artifacts"
+      type: "file"
+      source: "validation/validate-archive-untouched.sh"
+    - name: "validate-rerun"
+      description: "Runs cleanup.py again and checks it succeeds when there is nothing to delete"
+      type: "file"
+      source: "validation/validate-rerun.sh"
+
+teardown:
+  keepCluster: false
