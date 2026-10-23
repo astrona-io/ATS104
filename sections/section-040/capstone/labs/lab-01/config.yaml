@@ -9,7 +9,6 @@ metadata:
     question: "question.md"
     examQuestion: "question.md"
     prerequisites: "prerequisites.md"
-
 bootstrap:
   init:
     - name: "install-harbor"
@@ -20,7 +19,6 @@ bootstrap:
       description: "Creates the project ci with a pull-only robot builder and a broken webhook policy notify-ci"
       type: "file"
       source: "bootstrap/02-seed-state.sh"
-
 testing:
   init:
     - name: "wait-for-harbor"
@@ -31,7 +29,6 @@ testing:
       description: "The remediation a correct learner performs; used by `astrona test`"
       type: "file"
       source: "solution/apply.sh"
-
 validation:
   scripts:
     - name: "validate-same-objects"
@@ -46,6 +43,20 @@ validation:
       description: "Pushes to ci as the robot and waits for a CloudEvents webhook with the auth header"
       type: "file"
       source: "validation/validate-ci-push-notifies.sh"
-
 teardown:
   keepCluster: false
+runtime:
+  kind:
+    preloadImages:
+      - alpine:3.22
+      - docker.io/goharbor/harbor-core:v2.15.4
+      - docker.io/goharbor/harbor-db:v2.15.4
+      - docker.io/goharbor/harbor-jobservice:v2.15.4
+      - docker.io/goharbor/harbor-portal:v2.15.4
+      - docker.io/goharbor/harbor-registryctl:v2.15.4
+      - docker.io/goharbor/nginx-photon:v2.15.4
+      - docker.io/goharbor/registry-photon:v2.15.4
+      - docker.io/goharbor/trivy-adapter-photon:v2.15.4
+      - docker.io/valkey/valkey:8.1.10-alpine
+      - mendhak/http-https-echo:42
+      - python:3.13-alpine
