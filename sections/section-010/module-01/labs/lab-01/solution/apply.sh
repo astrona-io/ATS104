@@ -88,7 +88,7 @@ username="$2"
 email="$3"
 : "${ONBOARD_PASSWORD:?set ONBOARD_PASSWORD to the password for the new user}"
 
-if harbor project view "$project" </dev/null >/dev/null 2>&1; then
+if harbor project view "$project" -o json </dev/null >/dev/null 2>&1; then
   echo "project $project exists"
 else
   harbor project create "$project" --storage-limit -1 </dev/null

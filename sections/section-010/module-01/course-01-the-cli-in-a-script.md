@@ -97,8 +97,8 @@ The output is the project names, one per line: `library` (the project every new 
 The exit code is the second answer. A command that succeeds exits with `0`, and one that fails exits with another number. `kubectl exec` passes the exit code of the command in the pod back to your shell, so you can test it directly:
 
 ```sh
-ws harbor project view inventory </dev/null >/dev/null 2>&1; echo "inventory: exit $?"
-ws harbor project view no-such-project </dev/null >/dev/null 2>&1; echo "no-such-project: exit $?"
+ws harbor project view inventory -o json </dev/null >/dev/null 2>&1; echo "inventory: exit $?"
+ws harbor project view no-such-project -o json </dev/null >/dev/null 2>&1; echo "no-such-project: exit $?"
 ```
 
 The first line prints exit `0` and the second a non-zero exit code. That is all a script needs to decide whether to create the project.

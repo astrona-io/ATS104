@@ -100,7 +100,7 @@ harbor context switch ci </dev/null
 # /dev/null, so no command can swallow the lines that are still to come.
 while IFS=, read -r project username email <&3; do
   [ -n "$project" ] || continue
-  if ! harbor project view "$project" </dev/null >/dev/null 2>&1; then
+  if ! harbor project view "$project" -o json </dev/null >/dev/null 2>&1; then
     harbor project create "$project" --storage-limit -1 </dev/null
   fi
   if ! harbor user list --page-size 0 -o json </dev/null \
