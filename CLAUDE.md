@@ -317,6 +317,14 @@ That is the "Save this as" step for scripts.
 
 ### Environment facts the text must respect
 
+- **Harbor images are amd64 only (seen on a live run, 2026-10-23).** On an
+  arm64 machine (Apple silicon) every `goharbor/*` image runs under
+  emulation. The bundled Valkey (Redis) crashes there with a segmentation
+  fault, so every values file replaces it with the multi-architecture
+  `docker.io/valkey/valkey:8.1.10-alpine` (`redis.internal.image`). Keep
+  that override in every new values file; the other components work under
+  emulation. Upgrades must keep it too: use `--reuse-values` or a values
+  file that contains it.
 - **One address everywhere:** `https://harbor.localtest.me:8443`, through the
   CoreDNS `rewrite stop` block (answer name rewritten back) inside the
   cluster, and `kubectl -n harbor port-forward svc/harbor 8443:8443` on the
