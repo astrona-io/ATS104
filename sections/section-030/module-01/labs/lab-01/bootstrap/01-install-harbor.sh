@@ -170,7 +170,9 @@ kubectl apply -f "$MANIFEST_DIR/python-runner.yaml"
 kubectl -n "$NS_WS" rollout status deployment/python-runner --timeout=300s
 
 echo "[lab] Signing the harbor CLI and oras in as the administrator..."
-printf '%s' "$ADMIN_PASSWORD" | ws harbor login "$HARBOR_URL" -u "$ADMIN_USER" --password-stdin -n admin
+# harbor-cli v0.0.27 reads --password-stdin from a terminal only (term.ReadPassword),
+# so a script without one must pass the password with -p.
+ws harbor login "$HARBOR_URL" -u "$ADMIN_USER" -p "$ADMIN_PASSWORD" -n admin
 printf '%s' "$ADMIN_PASSWORD" | ws oras login "$HARBOR_REGISTRY" -u "$ADMIN_USER" --password-stdin >/dev/null
 ws mkdir -p /work
 
