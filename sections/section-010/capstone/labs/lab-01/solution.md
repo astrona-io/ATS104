@@ -32,7 +32,7 @@ Reading the script line by line gives six faults:
 | `harbor project create "$project" --public --storage-limit -1` | `--public` | The teams' projects are visible to every user |
 | `harbor project create`, `user create`, `member create` | No check before create | The second run fails at the first object that exists |
 | `harbor project member create "$project" --role Developers` | No `--username` | The CLI opens its interactive form to ask for the member, which hangs without a terminal |
-| `--role Developers` | Wrong role name | The CLI accepts `Developer`, not `Developers` |
+| `--role Developers` | Role given by name | The CLI (version 0.0.27) ignores `--role` and opens its interactive form; give the role as a number with `--roleid 2` |
 | `while read ...; do ... done < /work/teams.csv` | The loop's input is the CSV | Any command in the loop that reads standard input swallows the remaining lines, so later teams are skipped |
 
 The last fault is the hardest to see. Inside the loop, every command inherits the loop's standard input, which is the CSV file. A command that reads its input, such as a CLI prompt, reads the next lines of the file, and the loop never sees them. The fix is to read the CSV on a separate file descriptor and give every command `/dev/null`.
@@ -86,7 +86,7 @@ while IFS=, read -r project username email <&3; do
   fi
   if ! harbor project member list "$project" --page-size 100 -o json </dev/null \
       | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
-    harbor project member create "$project" --username "$username" --role Developer </dev/null
+    harbor project member create "$project" --username "$username" --roleid 2 </dev/null
   fi
   echo "onboarded $project"
 done 3< /work/teams.csv

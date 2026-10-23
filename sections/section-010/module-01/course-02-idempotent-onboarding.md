@@ -30,7 +30,7 @@ The diagram shows the order: each object is checked, created only when missing, 
 jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0'
 ```
 
-`harbor project member create <project> --username <user> --role Developer` adds the user with the Developer role, which can push and pull in that project. The role names the CLI accepts are `Project_Admin`, `Maintainer`, `Developer`, `Guest` and `Limited_Guest`.
+`harbor project member create <project> --username <user> --roleid 2` adds the user with the Developer role, which can push and pull in that project. `--roleid` takes the role as a number: `1` Project Admin, `2` Developer, `3` Guest, `4` Maintainer and `5` Limited Guest. The `harbor` CLI (version 0.0.27) also lists a `--role` flag for a role name, but it ignores that flag and opens an interactive form, which fails without a terminal.
 
 ## The script
 
@@ -58,7 +58,7 @@ if harbor project member list "$project" --page-size 100 -o json </dev/null \
     | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
   echo "$username is already a member of $project"
 else
-  harbor project member create "$project" --username "$username" --role Developer </dev/null
+  harbor project member create "$project" --username "$username" --roleid 2 </dev/null
   echo "$username added to $project as Developer"
 fi
 ```

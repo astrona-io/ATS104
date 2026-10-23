@@ -24,7 +24,7 @@ Each of the three objects needs a check that a script can trust:
 | --- | --- | --- |
 | Project | exit code of `harbor project view <project>` | `harbor project create <project> --storage-limit -1` (private without `--public`; without `--storage-limit` the CLI opens its interactive form) |
 | User | `harbor user list --page-size 0 -o json`, then `jq -e` on the field `username` | `harbor user create --username ... --email ... --realname ... --password "$ONBOARD_PASSWORD"` |
-| Membership | `harbor project member list <project> -o json`, then `jq -e` on the field `entity_name` | `harbor project member create <project> --username ... --role Developer` |
+| Membership | `harbor project member list <project> -o json`, then `jq -e` on the field `entity_name` | `harbor project member create <project> --username ... --roleid 2` |
 
 The list commands succeed whether or not the name is there, so their JSON is the answer, not their exit code. `--page-size 0` makes `harbor user list` return every user, not only the first page.
 
@@ -64,7 +64,7 @@ if harbor project member list "$project" --page-size 100 -o json </dev/null \
     | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
   echo "$username is already a member of $project"
 else
-  harbor project member create "$project" --username "$username" --role Developer </dev/null
+  harbor project member create "$project" --username "$username" --roleid 2 </dev/null
   echo "$username added to $project as Developer"
 fi
 ```
