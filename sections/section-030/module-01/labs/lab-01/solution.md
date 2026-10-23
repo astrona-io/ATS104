@@ -48,7 +48,7 @@ The `harbor` CLI can do the same with `harbor project robot create --robot-confi
 ## Step 3: Check the robot from Harbor's side
 
 ```sh
-ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100"' \
+ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100&q=Level=project,ProjectID=$(curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/ci" | jq .project_id)"' \
   | ws jq '.[] | select(.name == "robot$ci+builder") | {name, level, duration, disable, access: [.permissions[] | .namespace as $p | .access[] | "\($p) \(.resource):\(.action)"]}'
 ```
 

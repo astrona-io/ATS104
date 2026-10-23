@@ -8,7 +8,7 @@ The grader checks four things: the robot kept its ID, its permissions and durati
 
 ```sh
 ws() { kubectl -n workstation exec -i deploy/workstation -- "$@"; }
-ROBOT="$(ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100"' | ws jq -c '.[] | select(.name == "robot$inventory+deployer")')"
+ROBOT="$(ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100&q=Level=project,ProjectID=$(curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/inventory" | jq .project_id)"' | ws jq -c '.[] | select(.name == "robot$inventory+deployer")')"
 printf '%s' "$ROBOT" | ws jq '{id, name, duration, access: [.permissions[] | .namespace as $p | .access[] | "\($p) \(.resource):\(.action)"]}'
 ROBOT_ID="$(printf '%s' "$ROBOT" | ws jq -r '.id')"
 ```

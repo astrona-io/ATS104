@@ -19,7 +19,7 @@ ws sh -c 'cd /tmp && echo build > build.txt && oras push --registry-config /tmp/
 The login works, so the secret is fine, but the push is refused. Look at the robot and the policy:
 
 ```sh
-ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100"' \
+ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100&q=Level=project,ProjectID=$(curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/ci" | jq .project_id)"' \
   | ws jq '.[] | select(.name == "robot$ci+builder") | {id, access: [.permissions[].access[] | "\(.resource):\(.action)"]}'
 ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/ci/webhook/policies"' \
   | ws jq '.[] | select(.name == "notify-ci")'
@@ -40,7 +40,7 @@ ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/ci/webhook
 Start from the full robot object, change only its permissions, and send it back with `PUT`. The secret does not change:
 
 ```sh
-ROBOT_ID="$(ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100"' | ws jq -r '.[] | select(.name == "robot$ci+builder") | .id')"
+ROBOT_ID="$(ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100&q=Level=project,ProjectID=$(curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/ci" | jq .project_id)"' | ws jq -r '.[] | select(.name == "robot$ci+builder") | .id')"
 ws sh -c "curl -s -u admin:Harbor12345 \"\$HARBOR_URL/api/v2.0/robots/$ROBOT_ID\"" \
   | ws jq -c '.permissions = [{"kind":"project","namespace":"ci","access":[{"resource":"repository","action":"push"},{"resource":"repository","action":"pull"}]}]' \
   | ws sh -c "curl -s -o /dev/null -w '%{http_code}\n' -u admin:Harbor12345 -X PUT -H 'Content-Type: application/json' --data-binary @- \"\$HARBOR_URL/api/v2.0/robots/$ROBOT_ID\""

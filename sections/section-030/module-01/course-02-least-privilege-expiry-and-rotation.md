@@ -75,7 +75,7 @@ The login succeeds, the pull prints `pull: allowed`, and the push fails and prin
 Find the robot's ID, and refresh its secret:
 
 ```sh
-ROBOT_ID="$(ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100"' | ws jq -r '.[] | select(.name == "robot$inventory+reporter") | .id')"
+ROBOT_ID="$(ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100&q=Level=project,ProjectID=$(curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/inventory" | jq .project_id)"' | ws jq -r '.[] | select(.name == "robot$inventory+reporter") | .id')"
 ws sh -c "curl -s -o /dev/null -w '%{http_code}\n' -u admin:Harbor12345 -X PATCH -H 'Content-Type: application/json' -d '{\"secret\":\"Reporter-Rotated-2026\"}' \"\$HARBOR_URL/api/v2.0/robots/$ROBOT_ID\""
 ```
 

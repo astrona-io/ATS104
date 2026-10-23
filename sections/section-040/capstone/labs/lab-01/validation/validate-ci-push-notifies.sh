@@ -71,9 +71,17 @@ create_user() {
 }
 
 # robot_by_name FULL_NAME: prints the JSON of the robot with that full name
-# (for example robot$ci+builder), or nothing.
+# (for example robot$ci+builder), or nothing. Without a query, GET /robots
+# lists only system robots; a project robot needs Level=project and the
+# project's ID.
 robot_by_name() {
-  api GET "/robots?page_size=100" | ws jq -c --arg n "$1" '.[] | select(.name == $n)'
+  local project q=""
+  case "$1" in
+    'robot$'*+*)
+      project="${1#robot\$}"; project="${project%%+*}"
+      q="&q=Level%3Dproject%2CProjectID%3D$(api GET "/projects/$project" | ws jq -r '.project_id')" ;;
+  esac
+  api GET "/robots?page_size=100$q" | ws jq -c --arg n "$1" '.[] | select(.name == $n)'
 }
 # --------------------------------------------------------------------------
 
