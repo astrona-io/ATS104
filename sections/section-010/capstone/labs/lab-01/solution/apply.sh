@@ -76,26 +76,32 @@ robot_by_name() {
 }
 # --------------------------------------------------------------------------
 
+# Step 3 of solution.md: the one-time sign-in into the context "ci". The
+# learner types the password at the hidden prompt of `--password-stdin` in a
+# terminal (kubectl exec -it). `astrona test` has no terminal, and harbor-cli
+# v0.0.27 reads --password-stdin from a terminal only (term.ReadPassword), so
+# this stand-in uses -p. It is a setup step, not part of the learner's script.
+ws harbor login "$HARBOR_URL" -u "$ADMIN_USER" -p "$ADMIN_PASSWORD" -n ci </dev/null
+
 ws sh -c 'cat > /work/onboard-teams.sh' <<'SCRIPT'
 #!/bin/sh
 # onboard-teams.sh: onboards every team listed in /work/teams.csv
 # (project,username,email). The CI job runs it with no terminal attached.
-# HARBOR_PASSWORD is the administrator password, ONBOARD_PASSWORD the
-# password for new users. Safe to run again: it creates only what is missing.
+# It uses the saved CLI context "ci" (the administrator), which a person
+# created once at a terminal; the script itself holds no administrator
+# password. ONBOARD_PASSWORD is the password for new users.
+# Safe to run again: it creates only what is missing.
 set -eu
-: "${HARBOR_PASSWORD:?set HARBOR_PASSWORD}"
 : "${ONBOARD_PASSWORD:?set ONBOARD_PASSWORD}"
 
-printf '%s' "$HARBOR_PASSWORD" \
-  | harbor login https://harbor.localtest.me:8443 -u admin --password-stdin -n ci >/dev/null 2>&1 \
-  || harbor context switch ci </dev/null >/dev/null
+harbor context switch ci </dev/null
 
 # The CSV is read on file descriptor 3, and every harbor command reads
 # /dev/null, so no command can swallow the lines that are still to come.
 while IFS=, read -r project username email <&3; do
   [ -n "$project" ] || continue
   if ! harbor project view "$project" </dev/null >/dev/null 2>&1; then
-    harbor project create "$project" </dev/null
+    harbor project create "$project" --storage-limit -1 </dev/null
   fi
   if ! harbor user list --page-size 0 -o json </dev/null \
       | jq -e --arg u "$username" '[.. | objects | select(.username? == $u)] | length > 0' >/dev/null; then
@@ -109,4 +115,7 @@ while IFS=, read -r project username email <&3; do
   echo "onboarded $project"
 done 3< /work/teams.csv
 SCRIPT
-ws sh -c 'HARBOR_PASSWORD=Harbor12345 ONBOARD_PASSWORD=Team-Pass-2026 sh /work/onboard-teams.sh </dev/null'
+# Step 5 of solution.md: another context is current first, then the script runs.
+ws harbor context switch admin </dev/null
+ws sh -c 'ONBOARD_PASSWORD=Team-Pass-2026 sh /work/onboard-teams.sh </dev/null'
+ws sh -c 'ONBOARD_PASSWORD=Team-Pass-2026 sh /work/onboard-teams.sh </dev/null'

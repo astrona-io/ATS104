@@ -254,13 +254,17 @@ Check these first, in this order:
 
 1. **`harbor` CLI behaviour without a terminal.** The scripts assume that a
    command given its argument and flags never prompts, that `harbor project
-   view` exits non-zero for a missing project, that `harbor project create`
-   without `--public` makes a private project, and that `-o json` prints JSON
-   that `jq` can search for `username` and `entity_name` fields (the scripts
-   search with `..`, so the exact nesting does not matter).
-2. **`harbor login` a second time with the same `-n` name** (capstone 010):
-   the fixed script falls back to `harbor context switch ci` if the login
-   refuses an existing context name.
+   view` exits non-zero for a missing project, that `harbor project create
+   <name> --storage-limit -1` without `--public` makes a private project
+   without a prompt, and that `-o json` prints JSON that `jq` can search for
+   `username` and `entity_name` fields (the scripts search with `..`, so the
+   exact nesting does not matter).
+2. **The saved context `ci`** (capstone 010): the learner signs in once at a
+   terminal, the script only runs `harbor context switch ci`, and the graders
+   read `harbor context list -o json` (Go field names such as
+   `CurrentCredentialName` and `Credentials[].Name`; the v0.0.27 source has no
+   JSON tags on that struct). `harbor login` with an existing `-n` name
+   updates the saved credential (source: `RunLogin` in `login.go`).
 3. **`oras push` of an unknown artifact type** (`application/vnd.astrona.note.v1`)
    into Harbor, and `oras login --registry-config` for robot accounts.
 4. **The receiver log.** Graders search `kubectl -n hooks logs deploy/echo`
@@ -373,7 +377,7 @@ Webhooks`, weight `15`. Lab entries carry `title`, `path`, `difficulty`,
   `webhooks`.
 - `task_kind`: `build`, `troubleshooting` or `migration`.
 - `tags`: 4 to 8, only from this list: `harbor-cli`, `cli-context`,
-  `output-json`, `idempotency`, `password-stdin`, `ci-without-tty`,
+  `output-json`, `idempotency`, `ci-without-tty`,
   `users`, `project-members`, `rest-api`, `basic-auth`, `pagination`,
   `query-filter`, `python-urllib`, `tls-verification`, `untagged-artifacts`,
   `robot-account`, `project-robot`, `robot-permissions`, `secret-rotation`,
@@ -421,8 +425,20 @@ scripts check.
 Checked against the v0.0.27 command pages. The page
 <https://goharbor.io/cli-docs/cli-config/> still describes older behaviour.
 
-- `harbor login <server-url> -u <user> --password-stdin -n <context-name>`:
-  the context name flag is `-n` / `--context-name`, not `--name`.
+- `harbor login <server-url> -u <user> -n <context-name>` with
+  `--password-stdin` (at a terminal) or `-p <password>`: the context name flag
+  is `-n` / `--context-name`, not `--name`.
+- `--password-stdin` does **not** read a pipe. In v0.0.27 it prints
+  `Password:` and calls `term.ReadPassword` on stdin (`cmd/harbor/root/login.go`),
+  so it works only on a terminal; a piped password fails with `failed to read
+  password from stdin: inappropriate ioctl for device` (seen on a live run,
+  2026-10-23; upstream issue goharbor/harbor-cli#943 closed as wontfix). There
+  is no password environment variable. Teach "sign in once": a person signs in
+  at a terminal, and scripts run `harbor context switch <name>`. Bootstraps and
+  `solution/apply.sh` have no terminal and use `-p`.
+- `harbor project create <name>` opens its interactive form unless it gets
+  both the name and `--storage-limit` (`create.go`); scripts pass
+  `--storage-limit -1` (no limit).
 - Contexts are managed with `harbor context list|switch|get|update|delete`.
 - `harbor config` manages Harbor's **server-side** configuration
   (`get|update|view|apply`), not CLI credentials. Never use it for contexts.

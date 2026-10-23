@@ -4,13 +4,13 @@ A pipeline that creates a Harbor project for every new team needs three things f
 
 The `harbor` command-line tool (CLI) is the official client for Harbor's REST API, the HTTP interface every Harbor feature is built on. It runs on a laptop, in a container or in a CI job. This module is about using it in a script. Keep one sentence in mind: **a command in a script must get every answer from its arguments, and the script must check before it creates.**
 
-The module has two parts. **The harbor CLI In A Script** shows how the CLI saves its sign-in as a context, how it encrypts the password in a container, how to sign in without a prompt, and how to read JSON output and exit codes. **An Onboarding Script That Can Run Twice** builds a script that creates a project, a user and a Developer membership only when each is missing. A graded lab follows the second part.
+The module has two parts. **The harbor CLI In A Script** shows how the CLI saves its sign-in as a context, how it encrypts the password in a container, why a script selects a saved context instead of signing in, and how to read JSON output and exit codes. **An Onboarding Script That Can Run Twice** builds a script that creates a project, a user and a Developer membership only when each is missing. A graded lab follows the second part.
 
 ## Learning objectives
 
 After this module you can:
 
-- Sign the `harbor` CLI in with `--password-stdin`, and explain where it keeps the server, the user name and the password.
+- Sign the `harbor` CLI in once at a terminal, explain where it keeps the server, the user name and the password, and let a script select that context with `harbor context switch`.
 - Explain why the CLI needs `HARBOR_ENCRYPTION_KEY` in a container, and where the key should come from.
 - Explain when a CLI command waits for input, and keep it from doing so in a script.
 - Read a command's `-o json` output with `jq`, and use an exit code to decide what to do next.

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Confirms the script reads the administrator password from HARBOR_PASSWORD through stdin.
+# Confirms the script holds no password, does not call harbor login, selects the
+# context ci with harbor context switch, and that the context ci exists for admin.
 # Prints PASS or FAIL with the reason, and exits 0 only on PASS.
 set -uo pipefail
 # grep -q stops reading at the first match; under pipefail the command
@@ -75,10 +76,24 @@ robot_by_name() {
 }
 # --------------------------------------------------------------------------
 
-if ws grep -q 'Harbor12345' /work/onboard-teams.sh; then
+# The script without its comment lines, so a comment that mentions
+# harbor login does not count as a call.
+if ! SCRIPT_CODE="$(ws cat /work/onboard-teams.sh </dev/null | command grep -v '^[[:space:]]*#')"; then
+  echo "FAIL: /work/onboard-teams.sh is missing or has no commands."; exit 1
+fi
+if ws grep -q 'Harbor12345' /work/onboard-teams.sh </dev/null; then
   echo "FAIL: /work/onboard-teams.sh still contains the administrator password."; exit 1
 fi
-if ! ws grep -q -- '--password-stdin' /work/onboard-teams.sh; then
-  echo "FAIL: /work/onboard-teams.sh does not sign in with --password-stdin."; exit 1
+if printf '%s\n' "$SCRIPT_CODE" | grep -Eq 'harbor[[:space:]]+login'; then
+  echo "FAIL: /work/onboard-teams.sh still calls harbor login. Sign in once at a terminal; the script must only switch to the saved context."; exit 1
 fi
-echo "PASS: the script holds no password and signs in with --password-stdin."
+if ! printf '%s\n' "$SCRIPT_CODE" | grep -Eq "harbor[[:space:]]+context[[:space:]]+switch[[:space:]]+[\"']?ci[\"']?([[:space:]]|;|\$)"; then
+  echo "FAIL: /work/onboard-teams.sh does not select its context with 'harbor context switch ci'."; exit 1
+fi
+# context list -o json prints the CLI configuration (Go field names, for
+# example Credentials[].Name); the lower-case keys are a fallback.
+if ! ws harbor context list -o json </dev/null \
+    | ws jq -e '[(.Credentials // .credentials // [])[] | select((.Name // .name) == "ci" and (.Username // .username) == "admin")] | length > 0' >/dev/null 2>&1; then
+  echo "FAIL: the harbor CLI in the workstation pod has no context 'ci' for the user admin. Sign in once with harbor login ... -u admin -n ci at a terminal."; exit 1
+fi
+echo "PASS: the script holds no password and no harbor login, and switches to the saved context ci."

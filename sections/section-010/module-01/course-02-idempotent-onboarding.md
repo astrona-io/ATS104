@@ -20,7 +20,7 @@ The diagram shows the order: each object is checked, created only when missing, 
 
 ## The project: use the exit code
 
-`harbor project view <name>` exits with `0` when the project exists and with another code when it does not. That makes the project check one `if`. `harbor project create <name>` without `--public` creates a private project, which only its members can see.
+`harbor project view <name>` exits with `0` when the project exists and with another code when it does not. That makes the project check one `if`. `harbor project create <name> --storage-limit -1` creates a private project, which only its members can see, because `--public` is missing. The flag `--storage-limit -1` sets no storage limit, and a script needs it: the CLI skips its interactive form only when it gets both the project name and `--storage-limit`, so without the flag the command fails without a terminal.
 
 ## The membership: use the JSON
 
@@ -50,7 +50,7 @@ username="$2"
 if harbor project view "$project" </dev/null >/dev/null 2>&1; then
   echo "project $project exists"
 else
-  harbor project create "$project" </dev/null
+  harbor project create "$project" --storage-limit -1 </dev/null
   echo "project $project created"
 fi
 

@@ -1,6 +1,6 @@
 # The harbor CLI In A Script
 
-A command you type yourself can ask you a question, and you answer it. A command in a pipeline cannot: there is no person and no terminal, so a question either hangs the job until it times out or fails it with an error that is hard to read. This part shows how the `harbor` command-line tool (CLI) keeps its sign-in, how to sign it in without a prompt, and how a script reads the answers the CLI gives back.
+A command you type yourself can ask you a question, and you answer it. A command in a pipeline cannot: there is no person and no terminal, so a question either hangs the job until it times out or fails it with an error that is hard to read. This part shows how the `harbor` command-line tool (CLI) keeps its sign-in, why a script should use a saved sign-in instead of signing in itself, and how a script reads the answers the CLI gives back.
 
 ## Where the CLI keeps its sign-in
 
@@ -37,31 +37,40 @@ The command prints the confirmation line. This is the pattern for a pipeline: th
 ```mermaid
 flowchart LR
     S["Secret: harbor-cli-key"] -->|"env"| C["harbor CLI"]
-    P["password on stdin"] --> C
+    P["password typed at a prompt"] --> C
     C -->|"AES-GCM"| F["config.yaml"]
     C -->|"REST API"| H["Harbor core"]
 ```
 
-The diagram shows the CLI taking the password from standard input and the key from the environment, writing only the encrypted password to its configuration file, and then calling Harbor's API.
+The diagram shows the CLI taking the password from a person at a prompt and the key from the environment, writing only the encrypted password to its configuration file, and then calling Harbor's API.
 
-## Signing in without a prompt
+## Signing in once, at a terminal
 
-`harbor login` takes the server address as its argument, the user name with `-u` and the context name with `-n`. It can take the password with `-p`, but then the password sits in the command line, where the shell history and the process list can show it. The CLI's own help text recommends `--password-stdin`, which reads the password from standard input.
+`harbor login` takes the server address as its argument, the user name with `-u` and the context name with `-n`. It gets the password in one of two ways. The flag `-p` takes the password on the command line. The flag `--password-stdin` makes the CLI print `Password:` and wait for you to type it, without showing what you type.
 
-Sign in a second time, as the user `demo-dev` (lab-only password `Demo-Dev-2026`), into a new context:
+The name `--password-stdin` is misleading in CLI v0.0.27. Other tools such as `docker login` and `oras login` read a password that another command pipes in. The `harbor` CLI does not: it reads the password from a terminal only, so a piped password fails with the error `failed to read password from stdin: inappropriate ioctl for device`. A pipeline has no terminal, and the CLI has no environment variable for the password either.
 
-```sh
-printf '%s' 'Demo-Dev-2026' | ws harbor login https://harbor.localtest.me:8443 -u demo-dev --password-stdin -n demo-dev
-```
+So a script does not sign in at all. A person signs in once at a terminal and the CLI saves the context. The script then only selects that context with `harbor context switch`, which needs no password and no terminal.
 
-`harbor login` checks the user name and password against Harbor before it saves anything, so a wrong password fails here and not three commands later. The new context `demo-dev` is now the current one. List projects as that user, then switch back to the administrator:
+Sign in as the user `demo-dev` (lab-only password `Demo-Dev-2026`) into a new context. The `-t` flag of `kubectl exec` gives the command in the pod a terminal, so the prompt works. Type the password when the CLI asks for it:
 
 ```sh
-ws harbor project list
-ws harbor context switch admin
+kubectl -n workstation exec -it deploy/workstation -- harbor login https://harbor.localtest.me:8443 -u demo-dev --password-stdin -n demo-dev
 ```
 
-As `demo-dev`, the list shows only `library`, the public project every new Harbor has. `inventory` is missing, because it is private and `demo-dev` is not a member. Every command you run from here on uses the `admin` context again.
+`harbor login` checks the user name and password against Harbor before it saves anything, so a wrong password fails here and not three commands later. The new context `demo-dev` is now the current one.
+
+Now act as a script. The next command has no terminal and gets an empty standard input. It first makes `admin` current, so that the script part must select `demo-dev` itself. Then it selects the saved context `demo-dev`, lists the projects as that user, and switches back to `admin`:
+
+```sh
+ws sh -c 'harbor context switch admin </dev/null; harbor context switch demo-dev </dev/null && harbor project list </dev/null; harbor context switch admin </dev/null'
+```
+
+As `demo-dev`, the list shows only `library`, the public project every new Harbor has. `inventory` is missing, because it is private and `demo-dev` is not a member. No password was needed: the CLI decrypted the saved one with `HARBOR_ENCRYPTION_KEY`. Every command you run from here on uses the `admin` context again.
+
+The `-p` flag has a place too, but only for a sign-in you do once by hand. It puts the password in the command line, so your shell history and the process list can show it while the command runs. If a CI job must create its context itself, its setup step has no terminal, and `-p` with the password from the CI secret store is the only way in v0.0.27. Keep that one line in the setup step, not in the script that does the work.
+
+A second way is to sign in once at a terminal with the same `HARBOR_ENCRYPTION_KEY` that the CI job uses, and store the resulting configuration file in the CI secret store. The job then writes the file back before the script runs, and nobody types or passes a password in the job at all.
 
 ## Commands that wait for input
 
@@ -94,12 +103,13 @@ ws harbor project view no-such-project </dev/null >/dev/null 2>&1; echo "no-such
 
 The first line prints exit `0` and the second a non-zero exit code. That is all a script needs to decide whether to create the project.
 
-You now know where the CLI keeps its sign-in, how to sign in without a prompt, why a container needs `HARBOR_ENCRYPTION_KEY`, and how to read a command's JSON and exit code. The open question is how to combine these into a script that creates only what is missing, so that running it twice is safe.
+You now know where the CLI keeps its sign-in, why a script selects a saved context with `harbor context switch` instead of calling `harbor login`, why a container needs `HARBOR_ENCRYPTION_KEY`, and how to read a command's JSON and exit code. The open question is how to combine these into a script that creates only what is missing, so that running it twice is safe.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - **Passing the password with `-p` in a script.** It ends up in the shell history, the process list and the CI log. Use `--password-stdin` and read the password from a secret.
+> - **Piping a password into `harbor login --password-stdin`.** In CLI v0.0.27 the flag opens a hidden prompt on a terminal and does not read a pipe. Without a terminal it fails with `inappropriate ioctl for device`. Sign in once at a terminal, and let the script run `harbor context switch`.
+> - **Calling `harbor login` in the script.** The script then needs the password, and with `-p` the password ends up in the script, the process list or the CI log. The script should only select a context that already exists.
 > - **Leaving out an argument.** The command opens an interactive form and the pipeline hangs. Give every argument and flag, and add `</dev/null`.
 > - **Running the CLI in a container without `HARBOR_ENCRYPTION_KEY`.** The CLI falls back to a key file under `~/.harbor/keyring/` and prints a warning. Inject the key from a secret store instead.
 > - **Parsing the table output with `grep` or `awk`.** Tables change between releases. Use `-o json` and `jq`.

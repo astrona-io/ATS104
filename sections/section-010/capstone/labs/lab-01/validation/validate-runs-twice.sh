@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Runs the script twice the way CI does and checks both runs succeed.
+# Runs the script twice the way CI does (no terminal, stdin from /dev/null, no
+# administrator password) after making another context current, and checks
+# that both runs succeed and that the script left the context ci current.
 # Prints PASS or FAIL with the reason, and exits 0 only on PASS.
 set -uo pipefail
 # grep -q stops reading at the first match; under pipefail the command
@@ -75,9 +77,21 @@ robot_by_name() {
 }
 # --------------------------------------------------------------------------
 
+# Make the bootstrap's context admin current, so the runs only pass when the
+# script selects its own context.
+if ! ws harbor context switch admin </dev/null >/dev/null 2>&1; then
+  echo "FAIL: could not make the context admin current in the workstation pod."; exit 1
+fi
 for run in 1 2; do
-  if ! OUT="$(ws sh -c 'HARBOR_PASSWORD=Harbor12345 ONBOARD_PASSWORD=Team-Pass-2026 timeout 300 sh /work/onboard-teams.sh </dev/null' 2>&1)"; then
+  # kubectl exec -i without -t gives the pod no terminal; HARBOR_PASSWORD is
+  # unset on purpose, because the script must not need it.
+  if ! OUT="$(ws sh -c 'unset HARBOR_PASSWORD; ONBOARD_PASSWORD=Team-Pass-2026 timeout 300 sh /work/onboard-teams.sh </dev/null' </dev/null 2>&1)"; then
     echo "FAIL: run $run of onboard-teams.sh failed:"; echo "$OUT"; exit 1
   fi
 done
-echo "PASS: two runs without a terminal both succeed."
+CURRENT="$(ws harbor context list -o json </dev/null \
+  | ws jq -r '.CurrentCredentialName // ."current-credential-name" // empty' 2>/dev/null)"
+if [ "$CURRENT" != "ci" ]; then
+  echo "FAIL: after the runs the current context is '$CURRENT', not 'ci'; the script must run 'harbor context switch ci'."; exit 1
+fi
+echo "PASS: two runs without a terminal and without a password both succeed, using the context ci."

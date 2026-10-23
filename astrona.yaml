@@ -59,8 +59,8 @@ modules:
   - id: module-010
     title: "Automating Harbor With The harbor CLI"
     description: >
-      The harbor command-line tool inside scripts: signing in without a
-      prompt, contexts and the encryption key, JSON output, exit codes, and
+      The harbor command-line tool inside scripts: signing in once and
+      reusing the saved context, the encryption key, JSON output, exit codes, and
       an onboarding script that creates only what is missing, so it can run
       again safely.
 
@@ -114,10 +114,10 @@ modules:
         estimated_duration: 35m
         topic: cli-automation
         task_kind: troubleshooting
-        tags: [harbor-cli, password-stdin, ci-without-tty, idempotency, cli-context, project-members]
+        tags: [harbor-cli, ci-without-tty, idempotency, cli-context, users, project-members]
         learning_goals:
           - Find why a CLI script hangs, fails on a second run and onboards the wrong number of teams when it runs without a terminal
-          - Remove the hard-coded password and sign the CLI in with --password-stdin
+          - Remove the hard-coded password and the sign-in from the script, sign the CLI in once at a terminal, and select the saved context with harbor context switch
           - Prove the script onboards every team privately and can run twice
         resources:
           - name: "Harbor CLI config management"

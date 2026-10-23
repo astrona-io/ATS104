@@ -91,7 +91,7 @@ ws sh -c 'cat > /work/onboard-teams.sh' <<'SCRIPT'
 set -eu
 harbor login https://harbor.localtest.me:8443 -u admin -p Harbor12345 -n ci
 while IFS=, read -r project username email; do
-  harbor project create "$project" --public
+  harbor project create "$project" --public --storage-limit -1
   harbor user create --username "$username" --email "$email" --realname "$username" --password "$ONBOARD_PASSWORD"
   harbor project member create "$project" --role Developers
 done < /work/teams.csv

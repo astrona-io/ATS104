@@ -91,7 +91,7 @@ email="$3"
 if harbor project view "$project" </dev/null >/dev/null 2>&1; then
   echo "project $project exists"
 else
-  harbor project create "$project" </dev/null
+  harbor project create "$project" --storage-limit -1 </dev/null
   echo "project $project created"
 fi
 

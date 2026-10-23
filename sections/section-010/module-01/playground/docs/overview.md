@@ -24,7 +24,8 @@ Use them like this: `ws harbor project list`, `members inventory`, `copy_script 
 ## Practice tasks
 
 - Run `ws harbor project list -o json`, `-o yaml` and `-o csv` and compare what each format gives a script.
-- Sign in as `demo-dev` into a new context with `--password-stdin`, list the projects, and switch back with `ws harbor context switch admin`. Look at the configuration file after each step.
+- Sign in as `demo-dev` into a new context at a terminal with `kubectl -n workstation exec -it deploy/workstation -- harbor login https://harbor.localtest.me:8443 -u demo-dev --password-stdin -n demo-dev` (the CLI asks for the password). Then, without a terminal, run `ws sh -c 'harbor context switch demo-dev </dev/null && harbor project list </dev/null'` and switch back with `ws harbor context switch admin`. Look at the configuration file after each step.
+- Pipe the password into the same `harbor login ... --password-stdin` command with `printf` and `ws` instead, and read the error. In CLI v0.0.27 the flag reads from a terminal only.
 - Run `ws harbor project member list` without a project name, first with `kubectl exec -it` and then with `</dev/null`, and compare what happens.
 - Print the exit code of `harbor project view` for a project that exists and one that does not.
 - Write a script that onboards `demo-dev` into `team-demo`, run it twice, and check that the member list shows the user once.

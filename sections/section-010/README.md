@@ -2,14 +2,14 @@
 
 Clicking through the Harbor portal works for one project. It does not work for fifty teams, and it does not work inside a pipeline, where no person is there to click. The `harbor` command-line tool (CLI) is the official client for Harbor's REST API, and it is what you put in a script. A script that a pipeline runs has two extra requirements: it must never wait for a person to type, and it must give the same result when it runs a second time.
 
-This section turns the CLI into a reliable building block. You sign it in without a prompt, read its JSON output and exit codes, and write an onboarding script that creates only what is missing.
+This section turns the CLI into a reliable building block. You sign it in once at a terminal and let scripts reuse that saved sign-in, read its JSON output and exit codes, and write an onboarding script that creates only what is missing.
 
 **Topic covered:** Automating Harbor with the `harbor` CLI
 
 ## What you will learn
 
 - How the CLI stores a server, a user name and an encrypted password as a context, and why a container needs `HARBOR_ENCRYPTION_KEY`.
-- Signing in with `--password-stdin`, so no password lands in a script or in the shell history.
+- Signing in once at a terminal and letting a script select the saved context with `harbor context switch`, so no password lands in a script. In CLI v0.0.27, `--password-stdin` is a hidden terminal prompt, not a way to pipe a password in.
 - Why a CLI command can wait for input, and how to make sure it never does in a pipeline.
 - Reading `-o json` output with `jq`, and using exit codes to decide whether an object exists.
 - Writing an idempotent onboarding script: a project, a user and a membership, each created only when missing.

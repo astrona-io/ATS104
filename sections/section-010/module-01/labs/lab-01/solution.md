@@ -22,7 +22,7 @@ Each of the three objects needs a check that a script can trust:
 
 | Object | Check | Create |
 | --- | --- | --- |
-| Project | exit code of `harbor project view <project>` | `harbor project create <project>` (private without `--public`) |
+| Project | exit code of `harbor project view <project>` | `harbor project create <project> --storage-limit -1` (private without `--public`; without `--storage-limit` the CLI opens its interactive form) |
 | User | `harbor user list --page-size 0 -o json`, then `jq -e` on the field `username` | `harbor user create --username ... --email ... --realname ... --password "$ONBOARD_PASSWORD"` |
 | Membership | `harbor project member list <project> -o json`, then `jq -e` on the field `entity_name` | `harbor project member create <project> --username ... --role Developer` |
 
@@ -47,7 +47,7 @@ email="$3"
 if harbor project view "$project" </dev/null >/dev/null 2>&1; then
   echo "project $project exists"
 else
-  harbor project create "$project" </dev/null
+  harbor project create "$project" --storage-limit -1 </dev/null
   echo "project $project created"
 fi
 

@@ -31,12 +31,12 @@ testing:
       source: "solution/apply.sh"
 validation:
   scripts:
-    - name: "validate-no-password-in-script"
-      description: "Confirms the script reads the administrator password from HARBOR_PASSWORD through stdin"
+    - name: "validate-script-uses-context"
+      description: "Confirms the script holds no password, does not call harbor login, and switches to the saved context ci, which exists for admin"
       type: "file"
-      source: "validation/validate-no-password-in-script.sh"
+      source: "validation/validate-script-uses-context.sh"
     - name: "validate-runs-twice"
-      description: "Runs the script twice the way CI does and checks both runs succeed"
+      description: "Runs the script twice the way CI does, with no terminal and no administrator password, and checks both runs succeed with the context ci"
       type: "file"
       source: "validation/validate-runs-twice.sh"
     - name: "validate-every-team"
