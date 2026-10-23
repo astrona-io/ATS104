@@ -11,20 +11,21 @@ This is a **playground**, not a lab. It starts a fresh cluster, installs Harbor 
 
 ## Helpers
 
-Paste these once in each new terminal. `ws` runs a command in the workstation pod. `members` prints the members of a project as JSON, and `copy_script` copies a script from your machine into `/work`.
+Paste these once in each new terminal. `ws` runs a command in the workstation pod. `wst` does the same with a terminal. The `harbor` CLI (version 0.0.27) draws lists and views as a table only on a terminal, so list and view commands run through `wst`, which adds `-t` (a terminal) to `kubectl exec`. `members` prints the members of a project as JSON, and `copy_script` copies a script from your machine into `/work`.
 
 ```sh
 ws() { kubectl -n workstation exec -i deploy/workstation -- "$@"; }
+wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
 members() { ws sh -c "harbor project member list '$1' --page-size 100 -o json </dev/null"; }
 copy_script() { ws sh -c "cat > /work/$1" < "$1"; }
 ```
 
-Use them like this: `ws harbor project list`, `members inventory`, `copy_script onboard-member.sh`.
+Use them like this: `wst harbor project list`, `members inventory`, `copy_script onboard-member.sh`.
 
 ## Practice tasks
 
 - Run `ws harbor project list -o json`, `-o yaml` and `-o csv` and compare what each format gives a script.
-- Sign in as `demo-dev` into a new context at a terminal with `kubectl -n workstation exec -it deploy/workstation -- harbor login https://harbor.localtest.me:8443 -u demo-dev --password-stdin -n demo-dev` (the CLI asks for the password). Then, without a terminal, run `ws sh -c 'harbor context switch demo-dev </dev/null && harbor project list </dev/null'` and switch back with `ws harbor context switch admin`. Look at the configuration file after each step.
+- Sign in as `demo-dev` into a new context at a terminal with `kubectl -n workstation exec -it deploy/workstation -- harbor login https://harbor.localtest.me:8443 -u demo-dev --password-stdin -n demo-dev` (the CLI asks for the password). Then, without a terminal, run `ws sh -c 'harbor context switch demo-dev </dev/null && harbor project list -o json </dev/null'` and switch back with `ws harbor context switch admin`. Look at the configuration file after each step.
 - Pipe the password into the same `harbor login ... --password-stdin` command with `printf` and `ws` instead, and read the error. In CLI v0.0.27 the flag reads from a terminal only.
 - Run `ws harbor project member list` without a project name, first with `kubectl exec -it` and then with `</dev/null`, and compare what happens.
 - Print the exit code of `harbor project view` for a project that exists and one that does not.

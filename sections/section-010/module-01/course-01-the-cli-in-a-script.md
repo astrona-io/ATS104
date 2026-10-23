@@ -6,12 +6,13 @@ A command you type yourself can ask you a question, and you answer it. A command
 
 The CLI does not ask for a password on every command. It signs in once and saves the result as a **context**: a name, the Harbor server address, the user name and the password. All contexts live in one configuration file, by default `~/.config/harbor-cli/config.yaml`, and one of them is the current context that every command uses.
 
-The workstation pod already has one context, called `admin`, that the bootstrap created. List the contexts the CLI knows:
+The workstation pod already has one context, called `admin`, that the bootstrap created. List the contexts the CLI knows. The `harbor` CLI (version 0.0.27) draws lists and views as a table only on a terminal, so this command runs through `wst`, which adds `-t` (a terminal) to `kubectl exec`:
 
 <!-- astrona:playground:renew -->
 
 ```sh
-ws harbor context list
+wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
+wst harbor context list
 ```
 
 The list shows the context `admin` for the user `admin` at `https://harbor.localtest.me:8443`, marked as the current one. Now look at the file behind it:
@@ -63,7 +64,7 @@ kubectl -n workstation exec -it deploy/workstation -- harbor login https://harbo
 Now act as a script. The next command has no terminal and gets an empty standard input. It first makes `admin` current, so that the script part must select `demo-dev` itself. Then it selects the saved context `demo-dev`, lists the projects as that user, and switches back to `admin`:
 
 ```sh
-ws sh -c 'harbor context switch admin </dev/null; harbor context switch demo-dev </dev/null && harbor project list </dev/null; harbor context switch admin </dev/null'
+ws sh -c 'harbor context switch admin </dev/null; harbor context switch demo-dev </dev/null && harbor project list -o json </dev/null; harbor context switch admin </dev/null'
 ```
 
 As `demo-dev`, the list shows only `library`, the public project every new Harbor has. `inventory` is missing, because it is private and `demo-dev` is not a member. No password was needed: the CLI decrypted the saved one with `HARBOR_ENCRYPTION_KEY`. Every command you run from here on uses the `admin` context again.
@@ -79,10 +80,10 @@ Many CLI commands have an interactive mode. If you leave out an argument the com
 Two habits keep a script safe. First, always give every argument and flag the command needs. Second, give each command an empty standard input with `</dev/null`, so a prompt fails at once instead of waiting:
 
 ```sh
-ws sh -c 'harbor project member list inventory </dev/null'
+ws sh -c 'harbor project member list inventory -o json </dev/null'
 ```
 
-The command lists the members of `inventory`, which is only the administrator. The `</dev/null` changes nothing when the command has what it needs; it only matters when it does not.
+The command prints the members of `inventory` as JSON, and the only one is the administrator. In a script, list and view commands need `-o json`: without it, the CLI draws a table, which needs a terminal. The `</dev/null` changes nothing when the command has what it needs; it only matters when it does not.
 
 ## Reading the answers: JSON and exit codes
 

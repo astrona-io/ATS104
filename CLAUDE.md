@@ -312,8 +312,13 @@ Pages define the helpers they need once, with these names:
 
 ```sh
 ws() { kubectl -n workstation exec -i deploy/workstation -- "$@"; }
+wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
 py() { kubectl -n workstation exec -i deploy/python-runner -- "$@"; }
 ```
+
+`wst` adds a terminal (`-t`) and is only for `harbor` list and view commands
+without `-o json|yaml`: CLI v0.0.27 draws their table with bubbletea, which
+fails without a terminal. Scripts and `ws sh -c` use `-o json`.
 
 A script the reader writes on their machine goes into a pod with
 `ws sh -c 'cat > /work/onboard.sh' < onboard.sh` (or `py ...` for Python).

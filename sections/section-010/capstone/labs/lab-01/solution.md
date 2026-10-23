@@ -10,6 +10,7 @@ Define the helper, read the script and the CSV file:
 
 ```sh
 ws() { kubectl -n workstation exec -i deploy/workstation -- "$@"; }
+wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
 ws cat /work/onboard-teams.sh
 ws cat /work/teams.csv
 ```
@@ -32,7 +33,7 @@ Reading the script line by line gives six faults:
 | `harbor project create "$project" --public --storage-limit -1` | `--public` | The teams' projects are visible to every user |
 | `harbor project create`, `user create`, `member create` | No check before create | The second run fails at the first object that exists |
 | `harbor project member create "$project" --role Developers` | No `--username` | The CLI opens its interactive form to ask for the member, which hangs without a terminal |
-| `--role Developers` | Role given by name | The CLI (version 0.0.27) ignores `--role` and opens its interactive form; give the role as a number with `--roleid 2` |
+| `--role Developers` | Role given by name | The CLI (version 0.0.27) ignores `--role` and opens its interactive form; give the role as a number with `--roleid 1`, which the CLI turns into Developer (it adds 1) |
 | `while read ...; do ... done < /work/teams.csv` | The loop's input is the CSV | Any command in the loop that reads standard input swallows the remaining lines, so later teams are skipped |
 
 The last fault is the hardest to see. Inside the loop, every command inherits the loop's standard input, which is the CSV file. A command that reads its input, such as a CLI prompt, reads the next lines of the file, and the loop never sees them. The fix is to read the CSV on a separate file descriptor and give every command `/dev/null`.
@@ -50,8 +51,10 @@ kubectl -n workstation exec -it deploy/workstation -- harbor login https://harbo
 The CLI checks the password against Harbor, encrypts it with `HARBOR_ENCRYPTION_KEY` and saves it under the name `ci`. A context `ci` already exists from Step 1, so the CLI prints a warning that the credentials exist and updates the saved password. Check the result:
 
 ```sh
-ws harbor context list
+wst harbor context list
 ```
+
+The `harbor` CLI (version 0.0.27) draws lists and views as a table only on a terminal, so these commands run through `wst`, which adds `-t` (a terminal) to `kubectl exec`.
 
 The list shows `ci` for the user `admin` at `https://harbor.localtest.me:8443`, next to the context `admin`. You could also sign in with `-p Harbor12345` instead of `--password-stdin`. That works without a terminal, but it leaves the password in your shell history and shows it in the process list while the command runs, so keep it for a one-time setup step and never put it in the script.
 
@@ -86,7 +89,7 @@ while IFS=, read -r project username email <&3; do
   fi
   if ! harbor project member list "$project" --page-size 100 -o json </dev/null \
       | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
-    harbor project member create "$project" --username "$username" --roleid 2 </dev/null
+    harbor project member create "$project" --username "$username" --roleid 1 </dev/null
   fi
   echo "onboarded $project"
 done 3< /work/teams.csv
@@ -115,8 +118,8 @@ Both runs print `onboarded` for each of the three projects and exit with `0`. No
 Check the projects and members:
 
 ```sh
-ws harbor project list </dev/null
-ws harbor project member list team-gold </dev/null
+wst harbor project list
+wst harbor project member list team-gold
 ```
 
 The three team projects show as private, and `gold-dev` is a member of `team-gold` once, with the role Developer. The same holds for the other two teams.

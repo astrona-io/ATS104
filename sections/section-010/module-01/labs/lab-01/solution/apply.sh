@@ -108,7 +108,7 @@ if harbor project member list "$project" --page-size 100 -o json </dev/null \
     | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
   echo "$username is already a member of $project"
 else
-  harbor project member create "$project" --username "$username" --roleid 2 </dev/null
+  harbor project member create "$project" --username "$username" --roleid 1 </dev/null
   echo "$username added to $project as Developer"
 fi
 SCRIPT

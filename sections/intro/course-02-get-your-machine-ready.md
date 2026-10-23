@@ -17,14 +17,17 @@ Harbor needs memory. Give your container engine at least **4 GiB**. The playgrou
 
 ## How you work in the pods
 
-You run every Harbor command in the `workstation` pod and every Python script in the `python-runner` pod. Two short helpers save typing; define them in each new terminal:
+You run every Harbor command in the `workstation` pod and every Python script in the `python-runner` pod. Three short helpers save typing; define them in each new terminal:
 
 ```sh
 ws() { kubectl -n workstation exec -i deploy/workstation -- "$@"; }
+wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
 py() { kubectl -n workstation exec -i deploy/python-runner -- "$@"; }
 ```
 
-Now `ws harbor project list` runs the `harbor` CLI in the workstation pod. When a page asks you to write a script, you save it on your machine and copy it into the pod with a command like `ws sh -c 'cat > /work/onboard.sh' < onboard.sh`. The pod keeps it in its `/work` folder until the pod restarts.
+Now `wst harbor project list` runs the `harbor` CLI in the workstation pod. When a page asks you to write a script, you save it on your machine and copy it into the pod with a command like `ws sh -c 'cat > /work/onboard.sh' < onboard.sh`. The pod keeps it in its `/work` folder until the pod restarts.
+
+The `harbor` CLI (version 0.0.27) draws lists and views as a table only on a terminal, so these commands run through `wst`, which adds `-t` (a terminal) to `kubectl exec`.
 
 To look at the web portal, forward its port in a second terminal and open `https://harbor.localtest.me:8443`:
 

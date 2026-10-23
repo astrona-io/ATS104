@@ -30,7 +30,7 @@ The diagram shows the order: each object is checked, created only when missing, 
 jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0'
 ```
 
-`harbor project member create <project> --username <user> --roleid 2` adds the user with the Developer role, which can push and pull in that project. `--roleid` takes the role as a number: `1` Project Admin, `2` Developer, `3` Guest, `4` Maintainer and `5` Limited Guest. The `harbor` CLI (version 0.0.27) also lists a `--role` flag for a role name, but it ignores that flag and opens an interactive form, which fails without a terminal.
+`harbor project member create <project> --username <user> --roleid 1` adds the user with the Developer role, which can push and pull in that project. The `harbor` CLI (version 0.0.27) adds 1 to the `--roleid` number before it sends the request, so `--roleid 1` gives the Developer role, `--roleid 2` Guest, `--roleid 3` Maintainer and `--roleid 4` Limited Guest. The REST API's `role_id` is the real number: `1` Project Admin, `2` Developer, `3` Guest, `4` Maintainer and `5` Limited Guest. Check the role in the member list after you add someone. The `harbor` CLI (version 0.0.27) also lists a `--role` flag for a role name, but it ignores that flag and opens an interactive form, which fails without a terminal.
 
 ## The script
 
@@ -58,7 +58,7 @@ if harbor project member list "$project" --page-size 100 -o json </dev/null \
     | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
   echo "$username is already a member of $project"
 else
-  harbor project member create "$project" --username "$username" --roleid 2 </dev/null
+  harbor project member create "$project" --username "$username" --roleid 1 </dev/null
   echo "$username added to $project as Developer"
 fi
 ```
@@ -83,10 +83,11 @@ The script prints that it created the project `team-demo` and added `demo-dev` a
 ws sh -c 'sh /work/onboard-member.sh team-demo demo-dev </dev/null'; echo "exit $?"
 ```
 
-This time it prints that the project exists and that `demo-dev` is already a member, and the exit code is still `0`. Check the result from Harbor's side:
+This time it prints that the project exists and that `demo-dev` is already a member, and the exit code is still `0`. Check the result from Harbor's side. The `harbor` CLI (version 0.0.27) draws lists and views as a table only on a terminal, so this command runs through `wst`, which adds `-t` (a terminal) to `kubectl exec`:
 
 ```sh
-ws harbor project member list team-demo </dev/null
+wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
+wst harbor project member list team-demo
 ```
 
 The list shows `demo-dev` once, with the role Developer, next to the administrator who created the project. The second run changed nothing, which is exactly what idempotent means.

@@ -10,9 +10,12 @@ Define the helper and look at what exists:
 
 ```sh
 ws() { kubectl -n workstation exec -i deploy/workstation -- "$@"; }
-ws harbor project list </dev/null
-ws harbor project member list team-red </dev/null
+wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
+wst harbor project list
+wst harbor project member list team-red
 ```
+
+The `harbor` CLI (version 0.0.27) draws lists and views as a table only on a terminal, so these commands run through `wst`, which adds `-t` (a terminal) to `kubectl exec`.
 
 The project list shows `library`, `team-red` and no `team-blue`. The members of `team-red` are the administrator and `red-dev` with the role Developer. A script that creates blindly would fail for `team-red` at the first step.
 
@@ -24,7 +27,7 @@ Each of the three objects needs a check that a script can trust:
 | --- | --- | --- |
 | Project | exit code of `harbor project view <project> -o json` (without `-o json` the CLI draws a table and fails without a terminal) | `harbor project create <project> --storage-limit -1` (private without `--public`; without `--storage-limit` the CLI opens its interactive form) |
 | User | `harbor user list --page-size 0 -o json`, then `jq -e` on the field `username` | `harbor user create --username ... --email ... --realname ... --password "$ONBOARD_PASSWORD"` |
-| Membership | `harbor project member list <project> -o json`, then `jq -e` on the field `entity_name` | `harbor project member create <project> --username ... --roleid 2` |
+| Membership | `harbor project member list <project> -o json`, then `jq -e` on the field `entity_name` | `harbor project member create <project> --username ... --roleid 1` |
 
 The list commands succeed whether or not the name is there, so their JSON is the answer, not their exit code. `--page-size 0` makes `harbor user list` return every user, not only the first page.
 
@@ -64,7 +67,7 @@ if harbor project member list "$project" --page-size 100 -o json </dev/null \
     | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
   echo "$username is already a member of $project"
 else
-  harbor project member create "$project" --username "$username" --roleid 2 </dev/null
+  harbor project member create "$project" --username "$username" --roleid 1 </dev/null
   echo "$username added to $project as Developer"
 fi
 ```
@@ -94,8 +97,8 @@ ws sh -c 'ONBOARD_PASSWORD=Red-Team-2026 sh /work/onboard.sh team-red red-dev re
 It finds everything and exits with `0`. Check that nothing was doubled:
 
 ```sh
-ws harbor project member list team-blue </dev/null
-ws harbor project member list team-red </dev/null
+wst harbor project member list team-blue
+wst harbor project member list team-red
 ```
 
 Each list shows its developer once, with the role Developer.

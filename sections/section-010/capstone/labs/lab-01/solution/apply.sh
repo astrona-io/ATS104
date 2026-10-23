@@ -110,7 +110,7 @@ while IFS=, read -r project username email <&3; do
   fi
   if ! harbor project member list "$project" --page-size 100 -o json </dev/null \
       | jq -e --arg u "$username" '[.. | objects | select(.entity_name? == $u)] | length > 0' >/dev/null; then
-    harbor project member create "$project" --username "$username" --roleid 2 </dev/null
+    harbor project member create "$project" --username "$username" --roleid 1 </dev/null
   fi
   echo "onboarded $project"
 done 3< /work/teams.csv
