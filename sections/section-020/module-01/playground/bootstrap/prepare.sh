@@ -30,7 +30,9 @@ ADMIN_USER="admin"
 ADMIN_PASSWORD="Harbor12345"
 
 # ws COMMAND...: runs a command in the workstation pod.
-ws() { kubectl -n "$NS_WS" exec -i deploy/workstation -- "$@"; }
+# -c workstation: the pod also has the init container install-tools, and
+# without -c kubectl adds "Defaulted container ..." to stderr.
+ws() { kubectl -n "$NS_WS" exec -i -c workstation deploy/workstation -- "$@"; }
 # py COMMAND...: runs a command in the python-runner pod.
 py() { kubectl -n "$NS_WS" exec -i deploy/python-runner -- "$@"; }
 
