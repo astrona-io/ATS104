@@ -29,8 +29,6 @@ training:
     name: Harbor
     code: HARBOR
     provider: Astrona
-    domain: Harbor CLI Automation, REST API & Webhooks
-    weight: 15
 
 modules:
 
