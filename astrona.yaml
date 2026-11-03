@@ -124,6 +124,10 @@ modules:
             url: https://goharbor.io/cli-docs/cli-encryption/
           - name: "harbor login"
             url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-login.md
+      - type: quiz
+        title: "Knowledge Check: Automating Harbor With The harbor CLI"
+        path: sections/section-010/quiz.yaml
+        pass_score: 70
 
   - id: module-020
     title: "The Harbor REST API v2.0"
@@ -193,6 +197,10 @@ modules:
             url: https://github.com/goharbor/harbor/blob/v2.15.4/api/v2.0/swagger.yaml
           - name: "Working with images, tags and artifacts"
             url: https://goharbor.io/docs/2.15.0/working-with-projects/working-with-images/
+      - type: quiz
+        title: "Knowledge Check: The Harbor REST API v2.0"
+        path: sections/section-020/quiz.yaml
+        pass_score: 70
 
   - id: module-030
     title: "Robot Accounts For CI"
@@ -264,6 +272,10 @@ modules:
             url: https://goharbor.io/docs/2.15.0/administration/robot-accounts/
           - name: "harbor project robot refresh"
             url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-project-robot-refresh.md
+      - type: quiz
+        title: "Knowledge Check: Robot Accounts For CI"
+        path: sections/section-030/quiz.yaml
+        pass_score: 70
 
   - id: module-040
     title: "Webhooks For Pipelines"
@@ -330,3 +342,11 @@ modules:
             url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/configure-webhooks/
           - name: "Create project robot accounts"
             url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/create-robot-accounts/
+      - type: quiz
+        title: "Knowledge Check: Webhooks For Pipelines"
+        path: sections/section-040/quiz.yaml
+        pass_score: 70
+      - type: quiz
+        title: "Final Domain Quiz"
+        path: sections/final-domain-quiz.yaml
+        pass_score: 70

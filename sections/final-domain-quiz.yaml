@@ -1,0 +1,289 @@
+# Final domain knowledge check across all four sections.
+schema_version: 1
+kind: question_bank
+id: ats104-final
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: domain
+  id: harbor-automation
+  title: "Harbor CLI Automation, REST API & Webhooks"
+questions:
+  - id: ats104-final-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name where the CLI finds its encryption key"
+    source_readings:
+      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+    prompt: "Where does the `harbor` CLI look for its encryption key, in order?"
+    options:
+      - id: a
+        text: "First the keyring, then `HARBOR_ENCRYPTION_KEY`, then the Harbor server."
+        explanation: "Not correct. The variable comes first, and the server never holds the key."
+      - id: b
+        text: "First the variable `HARBOR_ENCRYPTION_KEY`, then the operating system keyring, then a key file under `~/.harbor/keyring/` with a warning."
+        explanation: "Correct. A container has no keyring, so CI jobs should set the variable."
+      - id: c
+        text: "First `~/.harbor/keyring/`, then the keyring, then `HARBOR_ENCRYPTION_KEY`."
+        explanation: "Not correct. The key file is the last fallback, not the first choice."
+      - id: d
+        text: "Only in `config.yaml`, next to the encrypted password."
+        explanation: "Not correct. Storing the key beside the password would make the encryption useless."
+    correct_option: b
+    explanation: "Correct. A container has no keyring, so CI jobs should set the variable."
+
+  - id: ats104-final-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use an exit code to test that a project exists"
+    source_readings:
+      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+    prompt: "How does an onboarding script test whether a project exists?"
+    options:
+      - id: a
+        text: "It runs `harbor project view <name> -o json` and uses the exit code: `0` means the project exists."
+        explanation: "Correct. Keep `-o json`; without it the CLI needs a terminal and exits with `1` even for an existing project."
+      - id: b
+        text: "It runs `harbor project list` and searches the table with `grep`."
+        explanation: "Not correct. Tables change between releases and `grep` matches part of a name."
+      - id: c
+        text: "It runs `harbor project create` and ignores the error if there is one."
+        explanation: "Not correct. That hides real errors and does not check anything."
+      - id: d
+        text: "It runs `harbor project member list` and tests its exit code."
+        explanation: "Not correct. That command lists members, not projects."
+    correct_option: a
+    explanation: "Correct. Keep `-o json`; without it the CLI needs a terminal and exits with `1` even for an existing project."
+
+  - id: ats104-final-q03
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Read the role number the CLI expects"
+    source_readings:
+      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+    prompt: "In CLI v0.0.27, `harbor project member create ... --roleid 1` is used. Which role does the user get?"
+    options:
+      - id: a
+        text: "Project Admin, because the REST API role_id `1` is Project Admin."
+        explanation: "Not correct. The CLI adds 1 first, so the API receives `2`."
+      - id: b
+        text: "Guest, because roles count from the least privileged one."
+        explanation: "Not correct. Guest is `--roleid 2` in the CLI."
+      - id: c
+        text: "Maintainer, because `1` is the first non-admin role."
+        explanation: "Not correct. Maintainer is `--roleid 3` in the CLI."
+      - id: d
+        text: "Developer, because the CLI adds 1 to the number before it sends the request."
+        explanation: "Correct. The REST API role_id `2` is Developer; the CLI number is one lower."
+    correct_option: d
+    explanation: "Correct. The REST API role_id `2` is Developer; the CLI number is one lower."
+
+  - id: ats104-final-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Recognize the anonymous list behavior"
+    source_readings:
+      - sections/section-020/module-01/course-01-base-path-authentication-and-errors.md
+    prompt: "A script forgets its credentials and sends `GET /api/v2.0/projects`. What does Harbor answer?"
+    options:
+      - id: a
+        text: "`401 UNAUTHORIZED` with an error body."
+        explanation: "Not correct. Anonymous list requests are not rejected."
+      - id: b
+        text: "`403 FORBIDDEN`, because the user has no permission."
+        explanation: "Not correct. Harbor filters the list rather than refusing it."
+      - id: c
+        text: "`200` with a short list that holds only the public projects."
+        explanation: "Correct. Harbor filters the list instead of failing, so a short list is a warning sign."
+      - id: d
+        text: "`200` with every project, because Harbor trusts the cluster network."
+        explanation: "Not correct. Private projects stay hidden from anonymous requests."
+    correct_option: c
+    explanation: "Correct. Harbor filters the list instead of failing, so a short list is a warning sign."
+
+  - id: ats104-final-q05
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Spot the default page size"
+    source_readings:
+      - sections/section-020/module-01/course-02-pages-filters-and-sorting.md
+    prompt: "A project has 12 repositories. A request without `page` or `page_size` returns 10 items. What does the body say about the missing 2?"
+    options:
+      - id: a
+        text: "It contains an error entry that names the missing items."
+        explanation: "Not correct. The body only holds the page."
+      - id: b
+        text: "Nothing. The default page size is `10` and the body is a valid list; only the headers show the total."
+        explanation: "Correct. A script that reads one page works on part of the data without an error."
+      - id: c
+        text: "It repeats the last item twice to fill the page."
+        explanation: "Not correct. Harbor does not pad lists."
+      - id: d
+        text: "Harbor answers `206 Partial Content` to warn the client."
+        explanation: "Not correct. The status is `200`."
+    correct_option: b
+    explanation: "Correct. A script that reads one page works on part of the data without an error."
+
+  - id: ats104-final-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Sort across pages"
+    source_readings:
+      - sections/section-020/module-01/course-02-pages-filters-and-sorting.md
+    prompt: "Why does a script send `sort=-creation_time` to Harbor and not sort each page itself?"
+    options:
+      - id: a
+        text: "A client that sorts each page gives the wrong order across pages. The server sorts the whole list, and `-` means descending."
+        explanation: "Correct. Newest first needs the whole list ordered."
+      - id: b
+        text: "The minus sign means the page is skipped."
+        explanation: "Not correct. A minus sign means descending order."
+      - id: c
+        text: "Harbor refuses unsorted requests above `page_size=10`."
+        explanation: "Not correct. Sorting is optional."
+      - id: d
+        text: "Sorting on the client is not possible in Python."
+        explanation: "Not correct. It is possible but gives a wrong order across pages."
+    correct_option: a
+    explanation: "Correct. Newest first needs the whole list ordered."
+
+  - id: ats104-final-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Quote a robot name in a shell"
+    source_readings:
+      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+    prompt: "Why does a script put `'robot$ci+builder'` in single quotes?"
+    options:
+      - id: a
+        text: "Harbor rejects names that are not quoted."
+        explanation: "Not correct. The shell changes the name before Harbor sees it."
+      - id: b
+        text: "The quotes encrypt the secret."
+        explanation: "Not correct. Quotes only control how the shell reads text."
+      - id: c
+        text: "The `+` would start a new command."
+        explanation: "Not correct. The problem is the `$`, not the `+`."
+      - id: d
+        text: "The shell would expand `$ci` as a variable, so the name would become `robot+builder`."
+        explanation: "Correct. Single quotes stop the expansion."
+    correct_option: d
+    explanation: "Correct. Single quotes stop the expansion."
+
+  - id: ats104-final-q08
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the duration"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "What does `duration: -1` mean for a robot?"
+    options:
+      - id: a
+        text: "The robot expires at once."
+        explanation: "Not correct. `-1` means no expiry."
+      - id: b
+        text: "The robot uses Harbor's default of 30 days."
+        explanation: "Not correct. The default applies when no duration is set."
+      - id: c
+        text: "The robot never expires, so a leaked secret stays useful forever."
+        explanation: "Correct. Give robots a duration in days instead."
+      - id: d
+        text: "The robot is disabled until an administrator enables it."
+        explanation: "Not correct. Enabling and disabling is a separate setting."
+    correct_option: c
+    explanation: "Correct. Give robots a duration in days instead."
+
+  - id: ats104-final-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Finish a rotation"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "After the secret is refreshed, what must you still do?"
+    options:
+      - id: a
+        text: "Nothing; Harbor updates the stores that use the robot."
+        explanation: "Not correct. Harbor does not know where the secret is stored."
+      - id: b
+        text: "Update every place that holds the old secret, such as the Kubernetes Secret, because jobs that use it now fail."
+        explanation: "Correct. List the places before you rotate."
+      - id: c
+        text: "Restart Harbor so the new secret is read."
+        explanation: "Not correct. The change takes effect at once."
+      - id: d
+        text: "Create a second robot with the same name for the new secret."
+        explanation: "Not correct. Names are unique and the robot already has the new secret."
+    correct_option: b
+    explanation: "Correct. List the places before you rotate."
+
+  - id: ats104-final-q10
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Use the webhook flags in a script"
+    source_readings:
+      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+    prompt: "What happens when `harbor webhook create` runs in a script without its flags?"
+    options:
+      - id: a
+        text: "It opens an interactive form and the script hangs, so a script gives all flags and adds `</dev/null`."
+        explanation: "Correct. The command takes the policy name as its argument and the rest as flags."
+      - id: b
+        text: "It creates a policy with default values."
+        explanation: "Not correct. It asks instead of guessing."
+      - id: c
+        text: "It creates a disabled policy that an administrator must enable."
+        explanation: "Not correct. No policy is created without the answers."
+      - id: d
+        text: "It fails at once with exit code `0`."
+        explanation: "Not correct. It waits for input."
+    correct_option: a
+    explanation: "Correct. The command takes the policy name as its argument and the rest as flags."
+
+  - id: ats104-final-q11
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Explain a TLS delivery error"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "A task log shows a TLS handshake error for `https://echo.hooks.svc.cluster.local:8443/secure`. What is the cause?"
+    options:
+      - id: a
+        text: "The auth header is missing."
+        explanation: "Not correct. A missing header would give an HTTP status, not a handshake error."
+      - id: b
+        text: "The event type does not match the push."
+        explanation: "Not correct. Then no request would be sent."
+      - id: c
+        text: "The receiver answered `200` too slowly."
+        explanation: "Not correct. A handshake error happens before any answer."
+      - id: d
+        text: "The receiver's certificate is signed by an authority Harbor does not trust, and `skip_cert_verify` is `false`."
+        explanation: "Correct. Use a trusted certificate, or a cluster-internal HTTP endpoint."
+    correct_option: d
+    explanation: "Correct. Use a trusted certificate, or a cluster-internal HTTP endpoint."
+
+  - id: ats104-final-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Connect GitHub Actions"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "Why does Harbor need a small relay before GitHub Actions?"
+    options:
+      - id: a
+        text: "GitHub Actions cannot read JSON."
+        explanation: "Not correct. It reads JSON in the required shape."
+      - id: b
+        text: "Harbor can send webhooks only to Jenkins."
+        explanation: "Not correct. Any HTTP endpoint works."
+      - id: c
+        text: "`repository_dispatch` accepts only `{\"event_type\": ..., \"client_payload\": {...}}` with a GitHub token, and Harbor's payload has another shape."
+        explanation: "Correct. The relay checks the auth header and calls GitHub's API."
+      - id: d
+        text: "The relay encrypts the artifact."
+        explanation: "Not correct. It only translates the request."
+    correct_option: c
+    explanation: "Correct. The relay checks the auth header and calls GitHub's API."
+

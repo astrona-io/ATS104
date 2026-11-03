@@ -1,0 +1,246 @@
+# Knowledge check for section 010. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats104-010
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-010
+  title: "Automating Harbor With The harbor CLI"
+placement:
+  position: after
+  reading: sections/section-010/capstone/labs/lab-01/question.md
+questions:
+  - id: ats104-010-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain what a harbor CLI context holds"
+    source_readings:
+      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+    prompt: "What does a context of the `harbor` CLI hold?"
+    options:
+      - id: a
+        text: "A name, the Harbor server address, the user name and an encrypted password, saved in one configuration file."
+        explanation: "Correct. The saved password is encrypted with AES-GCM."
+      - id: b
+        text: "Only an access token that the CLI renews on every command."
+        explanation: "Not correct. The CLI saves a user name and an encrypted password, not a token."
+      - id: c
+        text: "A project name and a role, so that every command acts inside one project."
+        explanation: "Not correct. A context names a sign-in, not a project or a role."
+      - id: d
+        text: "The Kubernetes namespace and the kubeconfig of the cluster that runs Harbor."
+        explanation: "Not correct. Contexts belong to the CLI and know nothing about Kubernetes."
+    correct_option: a
+    explanation: "Correct. The saved password is encrypted with AES-GCM."
+
+  - id: ats104-010-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name where the CLI finds its encryption key"
+    source_readings:
+      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+    prompt: "Where does the `harbor` CLI look for its encryption key, in order?"
+    options:
+      - id: a
+        text: "First the keyring, then `HARBOR_ENCRYPTION_KEY`, then the Harbor server."
+        explanation: "Not correct. The variable comes first, and the server never holds the key."
+      - id: b
+        text: "First the variable `HARBOR_ENCRYPTION_KEY`, then the operating system keyring, then a key file under `~/.harbor/keyring/` with a warning."
+        explanation: "Correct. A container has no keyring, so CI jobs should set the variable."
+      - id: c
+        text: "First `~/.harbor/keyring/`, then the keyring, then `HARBOR_ENCRYPTION_KEY`."
+        explanation: "Not correct. The key file is the last fallback, not the first choice."
+      - id: d
+        text: "Only in `config.yaml`, next to the encrypted password."
+        explanation: "Not correct. Storing the key beside the password would make the encryption useless."
+    correct_option: b
+    explanation: "Correct. A container has no keyring, so CI jobs should set the variable."
+
+  - id: ats104-010-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a piped password fails"
+    source_readings:
+      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+    prompt: "A pipeline runs `echo \"$PW\" | harbor login ... --password-stdin` and fails with `inappropriate ioctl for device`. Why?"
+    options:
+      - id: a
+        text: "The password in `$PW` is too short for AES-GCM."
+        explanation: "Not correct. The error is about the terminal, not about the password."
+      - id: b
+        text: "`harbor login` needs the flag `-o json` when it runs in a script."
+        explanation: "Not correct. That flag formats list output and does not affect sign-in."
+      - id: c
+        text: "In CLI v0.0.27 `--password-stdin` reads the password from a terminal only, and a pipeline has no terminal."
+        explanation: "Correct. The name of the flag is misleading in this version."
+      - id: d
+        text: "Harbor blocks sign-ins that come from a CI runner."
+        explanation: "Not correct. Harbor never sees the request; the CLI fails first."
+    correct_option: c
+    explanation: "Correct. The name of the flag is misleading in this version."
+
+  - id: ats104-010-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Describe the risk of the -p flag"
+    source_readings:
+      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+    prompt: "What is the risk of `harbor login -p <password>`?"
+    options:
+      - id: a
+        text: "The CLI saves the password without encryption."
+        explanation: "Not correct. The saved password is encrypted either way."
+      - id: b
+        text: "The password also becomes the password of the Harbor user for all other clients."
+        explanation: "Not correct. The flag only passes an existing password to the CLI."
+      - id: c
+        text: "The CLI sends the password to Harbor in plain text over HTTP."
+        explanation: "Not correct. The risk is local exposure, not the transport."
+      - id: d
+        text: "The password is on the command line, so the shell history and the process list can show it."
+        explanation: "Correct. Keep the flag for a one-time setup step only."
+    correct_option: d
+    explanation: "Correct. Keep the flag for a one-time setup step only."
+
+  - id: ats104-010-q05
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Prevent a script from waiting for input"
+    source_readings:
+      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+    prompt: "A command in a script is missing a required argument. What happens, and what keeps the script safe?"
+    options:
+      - id: a
+        text: "The CLI opens an interactive form and waits. Give every argument and flag, and add `</dev/null` so a prompt fails at once."
+        explanation: "Correct. Both habits are needed in a pipeline."
+      - id: b
+        text: "The CLI uses a default value and continues. Nothing needs to change."
+        explanation: "Not correct. It does not guess; it asks."
+      - id: c
+        text: "The CLI exits with `0` and prints a warning, so the script goes on."
+        explanation: "Not correct. It waits for a choice, and the job hangs."
+      - id: d
+        text: "The CLI reads the missing value from `HARBOR_ENCRYPTION_KEY`."
+        explanation: "Not correct. That variable only holds the encryption key."
+    correct_option: a
+    explanation: "Correct. Both habits are needed in a pipeline."
+
+  - id: ats104-010-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use an exit code to test that a project exists"
+    source_readings:
+      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+    prompt: "How does an onboarding script test whether a project exists?"
+    options:
+      - id: a
+        text: "It runs `harbor project list` and searches the table with `grep`."
+        explanation: "Not correct. Tables change between releases and `grep` matches part of a name."
+      - id: b
+        text: "It runs `harbor project view <name> -o json` and uses the exit code: `0` means the project exists."
+        explanation: "Correct. Keep `-o json`; without it the CLI needs a terminal and exits with `1` even for an existing project."
+      - id: c
+        text: "It runs `harbor project create` and ignores the error if there is one."
+        explanation: "Not correct. That hides real errors and does not check anything."
+      - id: d
+        text: "It runs `harbor project member list` and tests its exit code."
+        explanation: "Not correct. That command lists members, not projects."
+    correct_option: b
+    explanation: "Correct. Keep `-o json`; without it the CLI needs a terminal and exits with `1` even for an existing project."
+
+  - id: ats104-010-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Test membership with the JSON output"
+    source_readings:
+      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+    prompt: "Why does a script test membership with `jq -e` and not with the exit code of `harbor project member list`?"
+    options:
+      - id: a
+        text: "The command always fails when the user is a member."
+        explanation: "Not correct. It succeeds in both cases."
+      - id: b
+        text: "The command prints nothing for a project that has members."
+        explanation: "Not correct. It prints every member."
+      - id: c
+        text: "The command succeeds whether or not the user is a member, so only the JSON field `entity_name` tells the answer."
+        explanation: "Correct. `jq -e` turns the test into an exit code."
+      - id: d
+        text: "The exit code is `0` only for the administrator."
+        explanation: "Not correct. The exit code does not depend on who is listed."
+    correct_option: c
+    explanation: "Correct. `jq -e` turns the test into an exit code."
+
+  - id: ats104-010-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain the storage limit flag"
+    source_readings:
+      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+    prompt: "Why does the script pass `--storage-limit -1` to `harbor project create`?"
+    options:
+      - id: a
+        text: "It makes the project public so that every user can see it."
+        explanation: "Not correct. A project is public only with `--public`."
+      - id: b
+        text: "It limits the project to one repository."
+        explanation: "Not correct. `-1` means no storage limit."
+      - id: c
+        text: "It deletes old artifacts when the storage is full."
+        explanation: "Not correct. The flag sets a quota and does not clean anything."
+      - id: d
+        text: "The CLI skips its interactive form only when it gets both the project name and `--storage-limit`; `-1` sets no limit."
+        explanation: "Correct. Without the flag the command fails when no terminal exists."
+    correct_option: d
+    explanation: "Correct. Without the flag the command fails when no terminal exists."
+
+  - id: ats104-010-q09
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Read the role number the CLI expects"
+    source_readings:
+      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+    prompt: "In CLI v0.0.27, `harbor project member create ... --roleid 1` is used. Which role does the user get?"
+    options:
+      - id: a
+        text: "Developer, because the CLI adds 1 to the number before it sends the request."
+        explanation: "Correct. The REST API role_id `2` is Developer; the CLI number is one lower."
+      - id: b
+        text: "Project Admin, because the REST API role_id `1` is Project Admin."
+        explanation: "Not correct. The CLI adds 1 first, so the API receives `2`."
+      - id: c
+        text: "Guest, because roles count from the least privileged one."
+        explanation: "Not correct. Guest is `--roleid 2` in the CLI."
+      - id: d
+        text: "Maintainer, because `1` is the first non-admin role."
+        explanation: "Not correct. Maintainer is `--roleid 3` in the CLI."
+    correct_option: a
+    explanation: "Correct. The REST API role_id `2` is Developer; the CLI number is one lower."
+
+  - id: ats104-010-q10
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Prove that a script is idempotent"
+    source_readings:
+      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+    prompt: "How do you prove that an onboarding script is idempotent?"
+    options:
+      - id: a
+        text: "Run it once and read the output."
+        explanation: "Not correct. A first run says nothing about a second run."
+      - id: b
+        text: "Run it twice in a row; both runs exit with `0` and the second changes nothing."
+        explanation: "Correct. One successful run does not show that a second run is safe."
+      - id: c
+        text: "Add `set -eu` to the script and run it once."
+        explanation: "Not correct. `set -eu` stops on errors but does not prove a second run works."
+      - id: d
+        text: "Check that the script contains the word `create`."
+        explanation: "Not correct. The text of the script proves nothing about its behavior."
+    correct_option: b
+    explanation: "Correct. One successful run does not show that a second run is safe."
+

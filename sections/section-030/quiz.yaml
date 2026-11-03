@@ -1,0 +1,246 @@
+# Knowledge check for section 030. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats104-030
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-030
+  title: "Robot Accounts For CI"
+placement:
+  position: after
+  reading: sections/section-030/capstone/labs/lab-01/question.md
+questions:
+  - id: ats104-030-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read robot names"
+    source_readings:
+      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+    prompt: "Which names have the default forms of a project robot and a system robot?"
+    options:
+      - id: a
+        text: "`robot$nightly-scan` for a project robot and `robot$ci+builder` for a system robot."
+        explanation: "Not correct. A project robot name carries its project and a `+`."
+      - id: b
+        text: "`ci+builder` for both kinds."
+        explanation: "Not correct. Both kinds use the prefix."
+      - id: c
+        text: "`robot$ci+builder` for a project robot and `robot$nightly-scan` for a system robot."
+        explanation: "Correct. The prefix `robot$` is the default and can be changed."
+      - id: d
+        text: "`robot-ci-builder` for a project robot and `robot-nightly-scan` for a system robot."
+        explanation: "Not correct. The separators are `$` and `+`, not hyphens."
+    correct_option: c
+    explanation: "Correct. The prefix `robot$` is the default and can be changed."
+
+  - id: ats104-030-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Quote a robot name in a shell"
+    source_readings:
+      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+    prompt: "Why does a script put `'robot$ci+builder'` in single quotes?"
+    options:
+      - id: a
+        text: "Harbor rejects names that are not quoted."
+        explanation: "Not correct. The shell changes the name before Harbor sees it."
+      - id: b
+        text: "The quotes encrypt the secret."
+        explanation: "Not correct. Quotes only control how the shell reads text."
+      - id: c
+        text: "The `+` would start a new command."
+        explanation: "Not correct. The problem is the `$`, not the `+`."
+      - id: d
+        text: "The shell would expand `$ci` as a variable, so the name would become `robot+builder`."
+        explanation: "Correct. Single quotes stop the expansion."
+    correct_option: d
+    explanation: "Correct. Single quotes stop the expansion."
+
+  - id: ats104-030-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Give push together with pull"
+    source_readings:
+      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+    prompt: "A CI robot has only the permission `repository` `push`, and its pushes fail. What is missing?"
+    options:
+      - id: a
+        text: "The permission `repository` `pull`, because a registry client pulls layer information while it pushes."
+        explanation: "Correct. Harbor's documentation says push must come with pull."
+      - id: b
+        text: "The permission `repository` `delete`, which pushing replaces old layers with."
+        explanation: "Not correct. Pushing does not need delete."
+      - id: c
+        text: "The permission `scan` `create`, which a push starts first."
+        explanation: "Not correct. Scanning is separate from pushing."
+      - id: d
+        text: "The permission `tag` `list`, which names the pushed tag."
+        explanation: "Not correct. The missing permission is pull."
+    correct_option: a
+    explanation: "Correct. Harbor's documentation says push must come with pull."
+
+  - id: ats104-030-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Catch the secret at creation"
+    source_readings:
+      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+    prompt: "When does Harbor show a robot's secret?"
+    options:
+      - id: a
+        text: "At any time through `GET /api/v2.0/robots/<id>`."
+        explanation: "Not correct. The secret is not part of that response."
+      - id: b
+        text: "Only in the response to the request that creates the robot. After that you can only refresh it."
+        explanation: "Correct. Store it at once, for example in a Kubernetes Secret."
+      - id: c
+        text: "In the portal, under the robot's page, for 24 hours."
+        explanation: "Not correct. There is no time window."
+      - id: d
+        text: "Never; Harbor chooses the secret and keeps it hidden."
+        explanation: "Not correct. It appears once in the creation response."
+    correct_option: b
+    explanation: "Correct. Store it at once, for example in a Kubernetes Secret."
+
+  - id: ats104-030-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose least privilege"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "A cluster only pulls images from `inventory`. Which permissions does its robot get?"
+    options:
+      - id: a
+        text: "`repository` `pull` and `push`, in case images are built there later."
+        explanation: "Not correct. Extra permissions \"just in case\" raise the cost of a leak."
+      - id: b
+        text: "Every permission in `inventory` with `--all-permission`."
+        explanation: "Not correct. That flag is the opposite of least privilege."
+      - id: c
+        text: "`repository` `pull` in `inventory`, and nothing else."
+        explanation: "Correct. If the secret leaks, an attacker can read images but cannot replace them."
+      - id: d
+        text: "`repository` `pull` in every project."
+        explanation: "Not correct. The robot should reach only the project it needs."
+    correct_option: c
+    explanation: "Correct. If the secret leaks, an attacker can read images but cannot replace them."
+
+  - id: ats104-030-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the duration"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "What does `duration: -1` mean for a robot?"
+    options:
+      - id: a
+        text: "The robot expires at once."
+        explanation: "Not correct. `-1` means no expiry."
+      - id: b
+        text: "The robot uses Harbor's default of 30 days."
+        explanation: "Not correct. The default applies when no duration is set."
+      - id: c
+        text: "The robot is disabled until an administrator enables it."
+        explanation: "Not correct. Enabling and disabling is a separate setting."
+      - id: d
+        text: "The robot never expires, so a leaked secret stays useful forever."
+        explanation: "Correct. Give robots a duration in days instead."
+    correct_option: d
+    explanation: "Correct. Give robots a duration in days instead."
+
+  - id: ats104-030-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Respond fast to a suspected leak"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "What is the fastest way to stop all use of a robot's secret and keep its ID and history?"
+    options:
+      - id: a
+        text: "Disable the robot."
+        explanation: "Correct. Disabling stops every use at once without deleting the robot."
+      - id: b
+        text: "Delete the robot and create a new one."
+        explanation: "Not correct. The ID changes and the history is lost."
+      - id: c
+        text: "Lower the robot's duration to `-1`."
+        explanation: "Not correct. `-1` means the robot never expires."
+      - id: d
+        text: "Remove the `robot$` prefix in the system settings."
+        explanation: "Not correct. That renames robots and does not stop a secret."
+    correct_option: a
+    explanation: "Correct. Disabling stops every use at once without deleting the robot."
+
+  - id: ats104-030-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Rotate a secret in place"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "How do you rotate the secret of a robot without changing its ID?"
+    options:
+      - id: a
+        text: "Delete the robot and create it again with the same name."
+        explanation: "Not correct. The new robot gets a new ID."
+      - id: b
+        text: "Send `PATCH /api/v2.0/robots/<id>` with a new `secret`, or run `harbor project robot refresh <id>`."
+        explanation: "Correct. The old secret stops working and the permissions stay."
+      - id: c
+        text: "Send `PUT /api/v2.0/robots/<id>` with only the field `secret`."
+        explanation: "Not correct. A partial `PUT` can reset the fields it leaves out."
+      - id: d
+        text: "Wait for the robot to expire and create a new one."
+        explanation: "Not correct. The leaked secret works until it expires."
+    correct_option: b
+    explanation: "Correct. The old secret stops working and the permissions stay."
+
+  - id: ats104-030-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Finish a rotation"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "After the secret is refreshed, what must you still do?"
+    options:
+      - id: a
+        text: "Nothing; Harbor updates the stores that use the robot."
+        explanation: "Not correct. Harbor does not know where the secret is stored."
+      - id: b
+        text: "Restart Harbor so the new secret is read."
+        explanation: "Not correct. The change takes effect at once."
+      - id: c
+        text: "Update every place that holds the old secret, such as the Kubernetes Secret, because jobs that use it now fail."
+        explanation: "Correct. List the places before you rotate."
+      - id: d
+        text: "Create a second robot with the same name for the new secret."
+        explanation: "Not correct. Names are unique and the robot already has the new secret."
+    correct_option: c
+    explanation: "Correct. List the places before you rotate."
+
+  - id: ats104-030-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Change a robot with PUT"
+    source_readings:
+      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+    prompt: "You change a robot's permissions with `PUT /api/v2.0/robots/<id>`. What is the safe way?"
+    options:
+      - id: a
+        text: "Send only the field you want to change."
+        explanation: "Not correct. Fields you leave out can be removed."
+      - id: b
+        text: "Send an empty body to keep the current settings."
+        explanation: "Not correct. An empty body does not keep settings."
+      - id: c
+        text: "Use `POST` with the same name so that Harbor merges the fields."
+        explanation: "Not correct. `POST` creates a new robot."
+      - id: d
+        text: "Read the robot with `GET`, change the fields, and send the whole object back."
+        explanation: "Correct. Harbor replaces the settings with what you send."
+    correct_option: d
+    explanation: "Correct. Harbor replaces the settings with what you send."
+

@@ -1,0 +1,246 @@
+# Knowledge check for section 020. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats104-020
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-020
+  title: "The Harbor REST API v2.0"
+placement:
+  position: after
+  reading: sections/section-020/capstone/labs/lab-01/question.md
+questions:
+  - id: ats104-020-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Reach the API without credentials"
+    source_readings:
+      - sections/section-020/module-01/course-01-base-path-authentication-and-errors.md
+    prompt: "Which request works without credentials and shows that the address and TLS are correct?"
+    options:
+      - id: a
+        text: "`GET /api/v2.0/robots`, which lists robot accounts."
+        explanation: "Not correct. Robots need an administrator or project credentials."
+      - id: b
+        text: "`GET /api/v2.0/health`, which reports the health of each Harbor component."
+        explanation: "Correct. The base path of every endpoint is `/api/v2.0`."
+      - id: c
+        text: "`POST /api/v2.0/projects`, which creates a project."
+        explanation: "Not correct. Creating objects needs credentials."
+      - id: d
+        text: "`GET /api/v2.0/users`, which lists users."
+        explanation: "Not correct. User data needs credentials."
+    correct_option: b
+    explanation: "Correct. The base path of every endpoint is `/api/v2.0`."
+
+  - id: ats104-020-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Recognize the anonymous list behavior"
+    source_readings:
+      - sections/section-020/module-01/course-01-base-path-authentication-and-errors.md
+    prompt: "A script forgets its credentials and sends `GET /api/v2.0/projects`. What does Harbor answer?"
+    options:
+      - id: a
+        text: "`401 UNAUTHORIZED` with an error body."
+        explanation: "Not correct. Anonymous list requests are not rejected."
+      - id: b
+        text: "`403 FORBIDDEN`, because the user has no permission."
+        explanation: "Not correct. Harbor filters the list rather than refusing it."
+      - id: c
+        text: "`200` with a short list that holds only the public projects."
+        explanation: "Correct. Harbor filters the list instead of failing, so a short list is a warning sign."
+      - id: d
+        text: "`200` with every project, because Harbor trusts the cluster network."
+        explanation: "Not correct. Private projects stay hidden from anonymous requests."
+    correct_option: c
+    explanation: "Correct. Harbor filters the list instead of failing, so a short list is a warning sign."
+
+  - id: ats104-020-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Tell 401 and 403 apart"
+    source_readings:
+      - sections/section-020/module-01/course-01-base-path-authentication-and-errors.md
+    prompt: "A robot sends a valid secret, but Harbor answers `403`. What does that mean?"
+    options:
+      - id: a
+        text: "The secret is wrong or expired."
+        explanation: "Not correct. That gives `401`."
+      - id: b
+        text: "The object already exists."
+        explanation: "Not correct. That gives `409`."
+      - id: c
+        text: "The object does not exist."
+        explanation: "Not correct. That gives `404`."
+      - id: d
+        text: "The credentials are valid, but the robot lacks the permission for this request."
+        explanation: "Correct. `401` would mean the credentials themselves are not valid."
+    correct_option: d
+    explanation: "Correct. `401` would mean the credentials themselves are not valid."
+
+  - id: ats104-020-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the 409 status"
+    source_readings:
+      - sections/section-020/module-01/course-01-base-path-authentication-and-errors.md
+    prompt: "A script creates a project and Harbor answers `409`. What does it mean?"
+    options:
+      - id: a
+        text: "Conflict: an object with that name already exists."
+        explanation: "Correct. A script can treat it as \"already there\" when that is acceptable."
+      - id: b
+        text: "The request body is not valid JSON."
+        explanation: "Not correct. Harbor does not use `409` for syntax problems."
+      - id: c
+        text: "A project policy refused the request."
+        explanation: "Not correct. That is `412`."
+      - id: d
+        text: "The credentials are valid but too weak."
+        explanation: "Not correct. That is `403`."
+    correct_option: a
+    explanation: "Correct. A script can treat it as \"already there\" when that is acceptable."
+
+  - id: ats104-020-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Check that a name exists cheaply"
+    source_readings:
+      - sections/section-020/module-01/course-01-base-path-authentication-and-errors.md
+    prompt: "What does `HEAD /api/v2.0/projects?project_name=inventory` return?"
+    options:
+      - id: a
+        text: "`200` with the project as JSON."
+        explanation: "Not correct. A `HEAD` request has no body."
+      - id: b
+        text: "`200` when the project exists and `404` when it does not, with no body."
+        explanation: "Correct. It answers only the question \"does this exist\"."
+      - id: c
+        text: "Always `200`, and the answer is in the `X-Total-Count` header."
+        explanation: "Not correct. The status code is the answer."
+      - id: d
+        text: "`201` when the project exists."
+        explanation: "Not correct. `201` means something was created."
+    correct_option: b
+    explanation: "Correct. It answers only the question \"does this exist\"."
+
+  - id: ats104-020-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Spot the default page size"
+    source_readings:
+      - sections/section-020/module-01/course-02-pages-filters-and-sorting.md
+    prompt: "A project has 12 repositories. A request without `page` or `page_size` returns 10 items. What does the body say about the missing 2?"
+    options:
+      - id: a
+        text: "It contains an error entry that names the missing items."
+        explanation: "Not correct. The body only holds the page."
+      - id: b
+        text: "It repeats the last item twice to fill the page."
+        explanation: "Not correct. Harbor does not pad lists."
+      - id: c
+        text: "Nothing. The default page size is `10` and the body is a valid list; only the headers show the total."
+        explanation: "Correct. A script that reads one page works on part of the data without an error."
+      - id: d
+        text: "Harbor answers `206 Partial Content` to warn the client."
+        explanation: "Not correct. The status is `200`."
+    correct_option: c
+    explanation: "Correct. A script that reads one page works on part of the data without an error."
+
+  - id: ats104-020-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use the paging headers"
+    source_readings:
+      - sections/section-020/module-01/course-02-pages-filters-and-sorting.md
+    prompt: "Which response headers tell a script how long a list really is and where the next page is?"
+    options:
+      - id: a
+        text: "`Content-Length` and `Location`."
+        explanation: "Not correct. They describe the size of the body and a created object."
+      - id: b
+        text: "`X-Request-Id` and `Retry-After`."
+        explanation: "Not correct. `X-Request-Id` identifies the request and has no page information."
+      - id: c
+        text: "`ETag` and `Last-Modified`."
+        explanation: "Not correct. They support caching and not paging."
+      - id: d
+        text: "`X-Total-Count` holds the total number of items, and `Link` holds the next and previous page URLs."
+        explanation: "Correct. A script follows `Link` or counts items until it reaches `X-Total-Count`."
+    correct_option: d
+    explanation: "Correct. A script follows `Link` or counts items until it reaches `X-Total-Count`."
+
+  - id: ats104-020-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Filter on the server with q"
+    source_readings:
+      - sections/section-020/module-01/course-02-pages-filters-and-sorting.md
+    prompt: "Which `q` value returns repositories whose names contain `notes-1`?"
+    options:
+      - id: a
+        text: "`q=name=~notes-1`, where `=~` is the fuzzy match."
+        explanation: "Correct. Use `curl -G --data-urlencode` so that `=` and `~` are encoded."
+      - id: b
+        text: "`q=name=notes-1`, because it matches names that contain the text."
+        explanation: "Not correct. `key=value` is an exact match."
+      - id: c
+        text: "`q=name=[notes-1]`, because brackets match substrings."
+        explanation: "Not correct. Brackets with `~` between two values make a range."
+      - id: d
+        text: "`q=name={notes-1}`, because braces match substrings."
+        explanation: "Not correct. Braces list values that match exactly."
+    correct_option: a
+    explanation: "Correct. Use `curl -G --data-urlencode` so that `=` and `~` are encoded."
+
+  - id: ats104-020-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Sort across pages"
+    source_readings:
+      - sections/section-020/module-01/course-02-pages-filters-and-sorting.md
+    prompt: "Why does a script send `sort=-creation_time` to Harbor and not sort each page itself?"
+    options:
+      - id: a
+        text: "The minus sign means the page is skipped."
+        explanation: "Not correct. A minus sign means descending order."
+      - id: b
+        text: "A client that sorts each page gives the wrong order across pages. The server sorts the whole list, and `-` means descending."
+        explanation: "Correct. Newest first needs the whole list ordered."
+      - id: c
+        text: "Harbor refuses unsorted requests above `page_size=10`."
+        explanation: "Not correct. Sorting is optional."
+      - id: d
+        text: "Sorting on the client is not possible in Python."
+        explanation: "Not correct. It is possible but gives a wrong order across pages."
+    correct_option: b
+    explanation: "Correct. Newest first needs the whole list ordered."
+
+  - id: ats104-020-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Keep TLS verification on in Python"
+    source_readings:
+      - sections/section-020/module-01/course-03-a-python-script-with-the-standard-library.md
+    prompt: "How does the Python script talk to Harbor with a certificate from Harbor's own certificate authority?"
+    options:
+      - id: a
+        text: "It uses `ssl._create_unverified_context()` so that the error goes away."
+        explanation: "Not correct. That removes the check and sends the password to whoever answers."
+      - id: b
+        text: "It sends the password in the URL so TLS is not needed."
+        explanation: "Not correct. The password would be exposed."
+      - id: c
+        text: "It builds the context with `ssl.create_default_context(cafile=os.environ[\"HARBOR_CA\"])`, so the certificate is still verified."
+        explanation: "Correct. A wrong server or a forged certificate still fails."
+      - id: d
+        text: "It copies the CA file into `/etc/ssl/certs` in the Harbor pod."
+        explanation: "Not correct. The client must trust the CA, and changing Harbor does not help it."
+    correct_option: c
+    explanation: "Correct. A wrong server or a forged certificate still fails."
+

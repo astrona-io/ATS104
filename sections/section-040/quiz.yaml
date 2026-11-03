@@ -1,0 +1,246 @@
+# Knowledge check for section 040. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats104-040
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-040
+  title: "Webhooks For Pipelines"
+placement:
+  position: after
+  reading: sections/section-040/capstone/labs/lab-01/question.md
+questions:
+  - id: ats104-040-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the component that sends webhooks"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "Which Harbor component sends a webhook request after an artifact is pushed?"
+    options:
+      - id: a
+        text: "`core`, in the same request as the push."
+        explanation: "Not correct. `core` only creates the job."
+      - id: b
+        text: "`registry`, when it stores the last layer."
+        explanation: "Not correct. The registry stores blobs and does not send webhooks."
+      - id: c
+        text: "`trivy`, after it scans the artifact."
+        explanation: "Not correct. Scanning is a separate event."
+      - id: d
+        text: "`jobservice`, which `core` hands a webhook job to."
+        explanation: "Correct. The push finishes first, so a failed webhook never fails the push."
+    correct_option: d
+    explanation: "Correct. The push finishes first, so a failed webhook never fails the push."
+
+  - id: ats104-040-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Use the webhook flags in a script"
+    source_readings:
+      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+    prompt: "What happens when `harbor webhook create` runs in a script without its flags?"
+    options:
+      - id: a
+        text: "It opens an interactive form and the script hangs, so a script gives all flags and adds `</dev/null`."
+        explanation: "Correct. The command takes the policy name as its argument and the rest as flags."
+      - id: b
+        text: "It creates a policy with default values."
+        explanation: "Not correct. It asks instead of guessing."
+      - id: c
+        text: "It creates a disabled policy that an administrator must enable."
+        explanation: "Not correct. No policy is created without the answers."
+      - id: d
+        text: "It fails at once with exit code `0`."
+        explanation: "Not correct. It waits for input."
+    correct_option: a
+    explanation: "Correct. The command takes the policy name as its argument and the rest as flags."
+
+  - id: ats104-040-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Tell the payload formats apart"
+    source_readings:
+      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+    prompt: "A consumer expects CloudEvents. Which `type` does it see for a pushed artifact?"
+    options:
+      - id: a
+        text: "`PUSH_ARTIFACT`."
+        explanation: "Not correct. That is the name in the Default format."
+      - id: b
+        text: "`harbor.artifact.pushed`."
+        explanation: "Correct. The Default payload uses `PUSH_ARTIFACT` instead."
+      - id: c
+        text: "`artifact.push`."
+        explanation: "Not correct. Harbor does not use this name."
+      - id: d
+        text: "`harbor.push.completed`."
+        explanation: "Not correct. Harbor does not use this name."
+    correct_option: b
+    explanation: "Correct. The Default payload uses `PUSH_ARTIFACT` instead."
+
+  - id: ats104-040-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Use the auth header"
+    source_readings:
+      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+    prompt: "What is the auth header of a webhook policy for?"
+    options:
+      - id: a
+        text: "It encrypts the payload."
+        explanation: "Not correct. The payload is not encrypted by this field."
+      - id: b
+        text: "It selects the payload format."
+        explanation: "Not correct. The payload format is its own field."
+      - id: c
+        text: "Harbor sends it in the `Authorization` header so the receiver can check that the request comes from Harbor."
+        explanation: "Correct. Without the check, anyone who reaches the endpoint can start the pipeline."
+      - id: d
+        text: "It logs Harbor in to the CI system's web portal."
+        explanation: "Not correct. It is one fixed header on every request."
+    correct_option: c
+    explanation: "Correct. Without the check, anyone who reaches the endpoint can start the pipeline."
+
+  - id: ats104-040-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find why a delivery failed"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "A policy is enabled and the push worked, but nothing reaches the receiver. Where do you find the reason?"
+    options:
+      - id: a
+        text: "In the output of the `oras push` command."
+        explanation: "Not correct. The push succeeds whatever happens to the webhook."
+      - id: b
+        text: "In the policy's description."
+        explanation: "Not correct. The description is text written by a person."
+      - id: c
+        text: "In the `X-Total-Count` header of the policy list."
+        explanation: "Not correct. That header holds a count."
+      - id: d
+        text: "In the policy's executions, then the tasks of the latest execution, then the task log."
+        explanation: "Correct. The portal shows the same under the project's Webhooks tab."
+    correct_option: d
+    explanation: "Correct. The portal shows the same under the project's Webhooks tab."
+
+  - id: ats104-040-q06
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Explain a TLS delivery error"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "A task log shows a TLS handshake error for `https://echo.hooks.svc.cluster.local:8443/secure`. What is the cause?"
+    options:
+      - id: a
+        text: "The receiver's certificate is signed by an authority Harbor does not trust, and `skip_cert_verify` is `false`."
+        explanation: "Correct. Use a trusted certificate, or a cluster-internal HTTP endpoint."
+      - id: b
+        text: "The auth header is missing."
+        explanation: "Not correct. A missing header would give an HTTP status, not a handshake error."
+      - id: c
+        text: "The event type does not match the push."
+        explanation: "Not correct. Then no request would be sent."
+      - id: d
+        text: "The receiver answered `200` too slowly."
+        explanation: "Not correct. A handshake error happens before any answer."
+    correct_option: a
+    explanation: "Correct. Use a trusted certificate, or a cluster-internal HTTP endpoint."
+
+  - id: ats104-040-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Weigh skip_cert_verify"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "Why is `skip_cert_verify: true` a risk?"
+    options:
+      - id: a
+        text: "It turns off the payload."
+        explanation: "Not correct. The payload is still sent."
+      - id: b
+        text: "Harbor then sends the auth header to whoever answers at that address."
+        explanation: "Correct. Use it only for endpoints you control on a trusted network."
+      - id: c
+        text: "It makes Harbor retry forever."
+        explanation: "Not correct. It does not change retries."
+      - id: d
+        text: "It disables every other policy of the project."
+        explanation: "Not correct. It only affects this target."
+    correct_option: b
+    explanation: "Correct. Use it only for endpoints you control on a trusted network."
+
+  - id: ats104-040-q08
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Know the system-wide switch"
+    source_readings:
+      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+    prompt: "Webhooks are turned off in Configuration > System Settings. What happens to a policy that is enabled?"
+    options:
+      - id: a
+        text: "Only policies in the Default format still send."
+        explanation: "Not correct. The switch does not depend on the format."
+      - id: b
+        text: "Policies keep sending but without an auth header."
+        explanation: "Not correct. Nothing is sent."
+      - id: c
+        text: "No policy sends anything, whatever its own switch says."
+        explanation: "Correct. Check the system setting when no policy delivers."
+      - id: d
+        text: "Harbor turns the switch on again at the next push."
+        explanation: "Not correct. Harbor does not change it by itself."
+    correct_option: c
+    explanation: "Correct. Check the system setting when no policy delivers."
+
+  - id: ats104-040-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Connect GitHub Actions"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "Why does Harbor need a small relay before GitHub Actions?"
+    options:
+      - id: a
+        text: "GitHub Actions cannot read JSON."
+        explanation: "Not correct. It reads JSON in the required shape."
+      - id: b
+        text: "Harbor can send webhooks only to Jenkins."
+        explanation: "Not correct. Any HTTP endpoint works."
+      - id: c
+        text: "The relay encrypts the artifact."
+        explanation: "Not correct. It only translates the request."
+      - id: d
+        text: "`repository_dispatch` accepts only `{\"event_type\": ..., \"client_payload\": {...}}` with a GitHub token, and Harbor's payload has another shape."
+        explanation: "Correct. The relay checks the auth header and calls GitHub's API."
+    correct_option: d
+    explanation: "Correct. The relay checks the auth header and calls GitHub's API."
+
+  - id: ats104-040-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Keep the receiver fast"
+    source_readings:
+      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+    prompt: "A receiver does its work before it answers, and the pipeline starts twice. Why?"
+    options:
+      - id: a
+        text: "The request times out, so `jobservice` sees a failure and retries. The receiver should answer at once and work afterwards."
+        explanation: "Correct. A longer timeout is not the fix."
+      - id: b
+        text: "Harbor sends every event twice in the Default format."
+        explanation: "Not correct. It sends one request per policy and event."
+      - id: c
+        text: "The auth header is sent twice."
+        explanation: "Not correct. One header is sent per request."
+      - id: d
+        text: "Two policies always fire on every push."
+        explanation: "Not correct. That happens only if two policies listen for the event."
+    correct_option: a
+    explanation: "Correct. A longer timeout is not the fix."
+
