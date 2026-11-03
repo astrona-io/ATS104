@@ -13,18 +13,31 @@ This section turns the CLI into a reliable building block. You sign it in once a
 - Why a CLI command can wait for input, and how to make sure it never does in a pipeline.
 - Reading `-o json` output with `jq`, and using exit codes to decide whether an object exists.
 - Writing an idempotent onboarding script: a project, a user and a membership, each created only when missing.
+- Projects, repositories, artifacts, tag commands, retention and immutable-tag rules, and scans and vulnerability reports with the CLI.
 
 ## The learning path
 
-The module has a landing page, two parts, a graded lab right after the part it tests, and a summary. The landing page starts the module's playground, a cluster where you can explore freely.
+Each module has a landing page, four parts, a graded lab right after the part it tests, and a summary. The landing page starts the module's playground, a cluster where you can explore freely.
 
 ### 1. Script Harbor With The harbor CLI
 
 The playground holds Harbor with the project `inventory`, one artifact in it, and a user `demo-dev`. The CLI in the workstation pod is already signed in as the administrator.
 
-1. The harbor CLI In A Script
-2. An Onboarding Script That Can Run Twice, followed by the lab **Write An Idempotent Onboarding Script**
-3. Summary
+1. Contexts And The Encryption Key
+2. Signing In Once And Reading The Answers
+3. Commands, Flags And Output Formats
+4. An Onboarding Script That Can Run Twice, followed by the lab **Write An Idempotent Onboarding Script**
+5. Summary
+
+### 2. Projects, Repositories And Artifacts With The CLI
+
+The playground for module 2 holds Harbor with the projects `inventory` (an `app` repository with the tags `build-1` and `build-2`, and a second repository) and `archive`.
+
+1. Projects With The CLI
+2. Repositories And Artifacts
+3. Tags, Retention And Immutable Tags, followed by the lab **Promote A Build With Tags**
+4. Scans And Vulnerabilities
+5. Summary
 
 ## Section capstone: Repair An Onboarding Script That Breaks In CI
 

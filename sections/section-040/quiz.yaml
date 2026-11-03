@@ -19,7 +19,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Name the component that sends webhooks"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-04-retries-receivers-and-ci-systems.md
     prompt: "Which Harbor component sends a webhook request after an artifact is pushed?"
     options:
       - id: a
@@ -42,7 +42,7 @@ questions:
     difficulty: beginner
     learning_objective: "Use the webhook flags in a script"
     source_readings:
-      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+      - sections/section-040/module-01/course-01-webhook-policies-and-the-default-payload.md
     prompt: "What happens when `harbor webhook create` runs in a script without its flags?"
     options:
       - id: a
@@ -65,7 +65,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Tell the payload formats apart"
     source_readings:
-      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+      - sections/section-040/module-01/course-02-the-cloudevents-payload.md
     prompt: "A consumer expects CloudEvents. Which `type` does it see for a pushed artifact?"
     options:
       - id: a
@@ -88,7 +88,7 @@ questions:
     difficulty: beginner
     learning_objective: "Use the auth header"
     source_readings:
-      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+      - sections/section-040/module-01/course-01-webhook-policies-and-the-default-payload.md
     prompt: "What is the auth header of a webhook policy for?"
     options:
       - id: a
@@ -111,7 +111,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Find why a delivery failed"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-03-reading-a-failed-delivery.md
     prompt: "A policy is enabled and the push worked, but nothing reaches the receiver. Where do you find the reason?"
     options:
       - id: a
@@ -134,7 +134,7 @@ questions:
     difficulty: advanced
     learning_objective: "Explain a TLS delivery error"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-03-reading-a-failed-delivery.md
     prompt: "A task log shows a TLS handshake error for `https://echo.hooks.svc.cluster.local:8443/secure`. What is the cause?"
     options:
       - id: a
@@ -157,7 +157,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Weigh skip_cert_verify"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-04-retries-receivers-and-ci-systems.md
     prompt: "Why is `skip_cert_verify: true` a risk?"
     options:
       - id: a
@@ -180,7 +180,7 @@ questions:
     difficulty: beginner
     learning_objective: "Know the system-wide switch"
     source_readings:
-      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+      - sections/section-040/module-01/course-01-webhook-policies-and-the-default-payload.md
     prompt: "Webhooks are turned off in Configuration > System Settings. What happens to a policy that is enabled?"
     options:
       - id: a
@@ -203,7 +203,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Connect GitHub Actions"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-04-retries-receivers-and-ci-systems.md
     prompt: "Why does Harbor need a small relay before GitHub Actions?"
     options:
       - id: a
@@ -226,7 +226,7 @@ questions:
     difficulty: advanced
     learning_objective: "Keep the receiver fast"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-04-retries-receivers-and-ci-systems.md
     prompt: "A receiver does its work before it answers, and the pipeline starts twice. Why?"
     options:
       - id: a

@@ -1,6 +1,6 @@
-# Least Privilege, Expiry And Rotation
+# Least Privilege, Expiry And Secret Storage
 
-A robot secret ends up in many places: a CI variable, a Kubernetes Secret, sometimes by mistake in a build log or a ConfigMap. Sooner or later one leaks. What the leak costs depends on three choices made when the robot was created: what it may do, how long it lives, and how fast its secret can be replaced. This part makes those three choices on purpose.
+A robot secret ends up in many places: a CI variable, a Kubernetes Secret, sometimes by mistake in a build log or a ConfigMap. Sooner or later one leaks. What the leak costs depends on choices made when the robot was created: what it may do, and how long it lives. This part makes those choices on purpose and stores the secret where a job can read it without anyone seeing it.
 
 ## Least privilege: start from the job
 
@@ -68,43 +68,14 @@ ws sh -c 'cd /tmp && echo test > test.txt && oras push --registry-config /tmp/re
 
 The login succeeds, the pull prints `pull: allowed`, and the push fails and prints `push: refused`. The variable `$ROBOT_NAME` is in double quotes, so your shell does not expand the `$inventory` inside its value.
 
-## Rotate the secret
-
-**Rotating** a secret means replacing it with a new one so the old one stops working. Harbor calls this refreshing. `PATCH /api/v2.0/robots/<id>` with a body `{"secret": "<new secret>"}` sets a new secret you choose; it must be 8 to 128 characters with an uppercase letter, a lowercase letter and a digit. The `harbor` CLI does the same with `harbor project robot refresh <id>`, which lets Harbor generate a random secret, or takes yours with `--secret-stdin`.
-
-Find the robot's ID, and refresh its secret:
-
-```sh
-ROBOT_ID="$(ws sh -c 'curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/robots?page_size=100&q=Level=project,ProjectID=$(curl -s -u admin:Harbor12345 "$HARBOR_URL/api/v2.0/projects/inventory" | jq .project_id)"' | ws jq -r '.[] | select(.name == "robot$inventory+reporter") | .id')"
-ws sh -c "curl -s -o /dev/null -w '%{http_code}\n' -u admin:Harbor12345 -X PATCH -H 'Content-Type: application/json' -d '{\"secret\":\"Reporter-Rotated-2026\"}' \"\$HARBOR_URL/api/v2.0/robots/$ROBOT_ID\""
-```
-
-The `PATCH` returns `200`. The old secret, still in the Secret `inventory-reporter` and in `$ROBOT_SECRET`, now fails:
-
-```sh
-printf '%s' "$ROBOT_SECRET" | ws oras login --registry-config /tmp/old.json -u "$ROBOT_NAME" --password-stdin harbor.localtest.me:8443 || echo "old secret: refused"
-```
-
-The login fails and prints `old secret: refused`. The robot kept its ID, name and permissions; only the secret changed. The last step of every rotation is to update every place that holds the secret, here the Kubernetes Secret:
-
-```sh
-kubectl -n workstation create secret generic inventory-reporter \
-  --from-literal=username="$ROBOT_NAME" --from-literal=password='Reporter-Rotated-2026' \
-  --dry-run=client -o yaml | kubectl apply -f -
-```
-
-Changing a robot's permissions or duration goes through `PUT /api/v2.0/robots/<id>` with the whole robot object: read it with `GET`, change `permissions` or `duration`, and send it back. Harbor replaces the robot's settings with what you send, so a `PUT` with a partial object can remove what you left out.
-
-You can now choose a robot's permissions from its job, give it a lifetime, store its secret in Kubernetes, and rotate it in place. Together these keep the cost of a leaked secret small and the response to it fast.
+You can now choose a robot's permissions from its job, give it a lifetime, and store its secret in Kubernetes without printing it. The open question is what to do when the secret leaks or when its lifetime ends: how to replace it without breaking the robot.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - **Deleting and recreating a robot to "rotate" it.** Its ID changes, and audit history and any automation that refers to the ID break. Refresh the secret instead.
-> - **Rotating without updating the stores.** Every job that holds the old secret fails. List where the secret lives before you rotate.
 > - **Printing secrets to the terminal or CI log.** Pipe them straight into the Secret, as above.
-> - **Sending a partial object with `PUT`.** Fields you leave out can be reset. Always start from the `GET` response.
 > - **Robots that never expire.** A `duration` of `-1` keeps a leaked secret useful forever.
+> - **Giving a push robot to a cluster that only pulls.** If the secret leaks, an attacker can replace the images every pod runs.
 
 ## Your mission: Create A Push-Only Robot For CI
 

@@ -13,10 +13,11 @@ This section teaches the API the way a script uses it. You authenticate, read er
 - Pages and page sizes, and the response headers `X-Total-Count` and `Link`.
 - The `q` filter (exact, fuzzy and range) and the `sort` parameter.
 - A Python script that pages through a list with `urllib`, with Harbor's certificate authority (CA) trusted instead of verification turned off.
+- Artifact paths with a double-encoded repository name, tag, copy and delete requests with their status codes, scans, and the system, quota, audit-log and garbage-collection endpoints.
 
 ## The learning path
 
-The module has a landing page, three parts, a graded lab right after the part it tests, and a summary. The landing page starts the module's playground.
+Each module has a landing page, four parts, a graded lab right after the part it tests, and a summary. The landing page starts the module's playground, a cluster where you can explore freely.
 
 ### 1. Call The Harbor REST API
 
@@ -24,8 +25,19 @@ The playground holds Harbor with the project `inventory` (twelve small repositor
 
 1. Base Path, Authentication And Errors
 2. Pages, Filters And Sorting
-3. A Python Script With The Standard Library, followed by the lab **Report Every Repository In A Project**
-4. Summary
+3. Creating, Changing And Deleting
+4. A Python Script With The Standard Library, followed by the lab **Report Every Repository In A Project**
+5. Summary
+
+### 2. Artifacts, Scans And The System API
+
+The playground for module 2 holds Harbor with the project `inventory` (the repositories `web/frontend` and `web/backend`, whose names contain a slash) and the project `archive`.
+
+1. Artifact Paths And Double Encoding
+2. Tags, Copies And Deletes
+3. Scans And Vulnerability Reports
+4. System Information, Quotas, Audit Logs And Garbage Collection, followed by the lab **Tag An Artifact With Python**
+5. Summary
 
 ## Section capstone: Remove Untagged Artifacts Through The API
 

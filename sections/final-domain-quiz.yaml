@@ -16,7 +16,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Name where the CLI finds its encryption key"
     source_readings:
-      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+      - sections/section-010/module-01/course-01-contexts-and-the-encryption-key.md
     prompt: "Where does the `harbor` CLI look for its encryption key, in order?"
     options:
       - id: a
@@ -39,7 +39,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Use an exit code to test that a project exists"
     source_readings:
-      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - sections/section-010/module-01/course-04-idempotent-onboarding.md
     prompt: "How does an onboarding script test whether a project exists?"
     options:
       - id: a
@@ -62,7 +62,7 @@ questions:
     difficulty: advanced
     learning_objective: "Read the role number the CLI expects"
     source_readings:
-      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - sections/section-010/module-01/course-04-idempotent-onboarding.md
     prompt: "In CLI v0.0.27, `harbor project member create ... --roleid 1` is used. Which role does the user get?"
     options:
       - id: a
@@ -154,7 +154,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Quote a robot name in a shell"
     source_readings:
-      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+      - sections/section-030/module-01/course-02-using-a-robot.md
     prompt: "Why does a script put `'robot$ci+builder'` in single quotes?"
     options:
       - id: a
@@ -177,7 +177,7 @@ questions:
     difficulty: beginner
     learning_objective: "Read the duration"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-03-least-privilege-expiry-and-secret-storage.md
     prompt: "What does `duration: -1` mean for a robot?"
     options:
       - id: a
@@ -200,7 +200,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Finish a rotation"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-04-rotating-a-robot-secret.md
     prompt: "After the secret is refreshed, what must you still do?"
     options:
       - id: a
@@ -223,7 +223,7 @@ questions:
     difficulty: beginner
     learning_objective: "Use the webhook flags in a script"
     source_readings:
-      - sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
+      - sections/section-040/module-01/course-01-webhook-policies-and-the-default-payload.md
     prompt: "What happens when `harbor webhook create` runs in a script without its flags?"
     options:
       - id: a
@@ -246,7 +246,7 @@ questions:
     difficulty: advanced
     learning_objective: "Explain a TLS delivery error"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-03-reading-a-failed-delivery.md
     prompt: "A task log shows a TLS handshake error for `https://echo.hooks.svc.cluster.local:8443/secure`. What is the cause?"
     options:
       - id: a
@@ -269,7 +269,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Connect GitHub Actions"
     source_readings:
-      - sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+      - sections/section-040/module-01/course-04-retries-receivers-and-ci-systems.md
     prompt: "Why does Harbor need a small relay before GitHub Actions?"
     options:
       - id: a
@@ -287,3 +287,186 @@ questions:
     correct_option: c
     explanation: "Correct. The relay checks the auth header and calls GitHub's API."
 
+  - id: ats104-final-q13
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Filter projects by part of a value"
+    source_readings:
+      - sections/section-010/module-02/course-01-projects-with-the-cli.md
+    prompt: "Which flag of `harbor project list` selects projects whose name contains `inv`?"
+    options:
+      - id: a
+        text: "`--match name=inv`"
+        explanation: "Not correct. `--match` needs the whole value."
+      - id: b
+        text: "`--range name=inv`"
+        explanation: "Not correct. `--range` takes `key=min~max`."
+      - id: c
+        text: "`--fuzzy name=inv`"
+        explanation: "Correct. `--fuzzy` is a partial match and `--match` is an exact match."
+      - id: d
+        text: "`--public inv`"
+        explanation: "Not correct. `--public` is a switch for visibility and takes no value."
+    correct_option: c
+    explanation: "Correct. `--fuzzy` is a partial match and `--match` is an exact match."
+
+  - id: ats104-final-q14
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name an artifact in a tag command"
+    source_readings:
+      - sections/section-010/module-02/course-03-tags-retention-and-immutable-tags.md
+    prompt: "Which command adds the tag `stable` to the artifact that has the tag `build-2` in `inventory/app`?"
+    options:
+      - id: a
+        text: "`harbor artifact tags create inventory/app/build-2 stable`"
+        explanation: "Correct. The artifact is `<project>/<repository>/<reference>`, followed by the new tag."
+      - id: b
+        text: "`harbor artifact tags create inventory/app:build-2 stable`"
+        explanation: "Not correct. The tag commands use a slash before the reference, not a colon."
+      - id: c
+        text: "`harbor artifact tags create stable inventory/app/build-2`"
+        explanation: "Not correct. The artifact comes first and the tag second."
+      - id: d
+        text: "`harbor tag create inventory/app build-2 stable`"
+        explanation: "Not correct. There is no such command; `harbor tag` holds the retention and immutable rules."
+    correct_option: a
+    explanation: "Correct. The artifact is `<project>/<repository>/<reference>`, followed by the new tag."
+
+  - id: ats104-final-q15
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Encode a name in Python"
+    source_readings:
+      - sections/section-020/module-02/course-01-artifact-paths-and-double-encoding.md
+    prompt: "Which Python expression gives `web%252Ffrontend` for `web/frontend`?"
+    options:
+      - id: a
+        text: "`urllib.parse.quote(name)`"
+        explanation: "Not correct. By default `quote` keeps the slash as it is."
+      - id: b
+        text: "`urllib.parse.quote(name, safe=\"\")`"
+        explanation: "Not correct. That encodes once and gives `web%2Ffrontend`."
+      - id: c
+        text: "`name.replace(\"/\", \"%252F\")` applied to the project and repository"
+        explanation: "Not correct. The project name is not encoded this way and is not part of the repository name."
+      - id: d
+        text: "`urllib.parse.quote(urllib.parse.quote(name, safe=\"\"), safe=\"\")`"
+        explanation: "Correct. `safe=\"\"` makes `quote` encode the slash too."
+    correct_option: d
+    explanation: "Correct. `safe=\"\"` makes `quote` encode the slash too."
+
+  - id: ats104-final-q16
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find out what garbage collection removes"
+    source_readings:
+      - sections/section-020/module-02/course-04-system-information-quotas-audit-logs-and-garbage-collection.md
+    prompt: "A pipeline deletes old artifacts, but the storage use of the project does not drop. What is missing?"
+    options:
+      - id: a
+        text: "A garbage collection, which removes blobs that no artifact uses."
+        explanation: "Correct. A delete removes the name, and GC returns the space."
+      - id: b
+        text: "A second delete request for each artifact."
+        explanation: "Not correct. The first delete already removed the artifact."
+      - id: c
+        text: "A scan of the project."
+        explanation: "Not correct. A scan reads artifacts and frees no space."
+      - id: d
+        text: "A change of the project quota."
+        explanation: "Not correct. The quota is a limit and does not free space."
+    correct_option: a
+    explanation: "Correct. A delete removes the name, and GC returns the space."
+
+  - id: ats104-final-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Respond to a suspected leak"
+    source_readings:
+      - sections/section-030/module-02/course-02-the-lifecycle-of-a-robot.md
+    prompt: "A robot secret may have leaked. What is the safest first response that can be undone?"
+    options:
+      - id: a
+        text: "Disable the robot, then refresh the secret and enable it again."
+        explanation: "Correct. Disabling stops all use at once and keeps the robot."
+      - id: b
+        text: "Delete the robot at once."
+        explanation: "Not correct. A delete cannot be undone, and it removes the robot ID the audit trail refers to."
+      - id: c
+        text: "Wait for the robot to expire."
+        explanation: "Not correct. The secret stays usable until then."
+      - id: d
+        text: "Change the description of the robot."
+        explanation: "Not correct. The description does not affect the secret."
+    correct_option: a
+    explanation: "Correct. Disabling stops all use at once and keeps the robot."
+
+  - id: ats104-final-q18
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Diagnose an image pull failure"
+    source_readings:
+      - sections/section-030/module-02/course-04-robots-in-pipelines-and-kubernetes-pull-secrets.md
+    prompt: "New pods fail with `ImagePullBackOff` and the event says `unauthorized`, but running pods are fine. What is the likely cause?"
+    options:
+      - id: a
+        text: "The robot has no permission on the project."
+        explanation: "Not correct. That gives a `denied` message, not `unauthorized`."
+      - id: b
+        text: "The pod is in the wrong namespace of Harbor."
+        explanation: "Not correct. Harbor has projects, not namespaces for pods."
+      - id: c
+        text: "The image is too large."
+        explanation: "Not correct. Size does not cause an authentication error."
+      - id: d
+        text: "The robot secret in the pull Secret expired or was refreshed, and only new pulls notice."
+        explanation: "Correct. Running pods have already pulled their images."
+    correct_option: d
+    explanation: "Correct. Running pods have already pulled their images."
+
+  - id: ats104-final-q19
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Pause a policy"
+    source_readings:
+      - sections/section-040/module-02/course-02-managing-policies-with-the-rest-api.md
+    prompt: "A receiver is down for maintenance. How do you stop deliveries and keep the policy settings?"
+    options:
+      - id: a
+        text: "Delete the policy and create it again later."
+        explanation: "Not correct. A delete loses the settings and the ID."
+      - id: b
+        text: "Change the event type to `PULL_ARTIFACT`."
+        explanation: "Not correct. That changes what fires and does not stop it."
+      - id: c
+        text: "Send a `PUT` with only `enabled`."
+        explanation: "Not correct. A `PUT` replaces the whole policy, so fields left out are cleared."
+      - id: d
+        text: "Set `enabled` to false with a `PUT` that holds the whole policy."
+        explanation: "Correct. Set it back to true afterwards."
+    correct_option: d
+    explanation: "Correct. Set it back to true afterwards."
+
+  - id: ats104-final-q20
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Trace a missing webhook"
+    source_readings:
+      - sections/section-040/module-02/course-04-troubleshooting-a-webhook-that-does-not-arrive.md
+    prompt: "`lasttrigger` shows no recent time for `DELETE_ARTIFACT`, though artifacts were deleted. Where is the cause?"
+    options:
+      - id: a
+        text: "The receiver rejected the auth header."
+        explanation: "Not correct. That would show a delivery with an error status."
+      - id: b
+        text: "The cluster DNS has no host name."
+        explanation: "Not correct. That also needs a delivery that failed."
+      - id: c
+        text: "The receiver needs a certificate."
+        explanation: "Not correct. TLS errors appear in a delivery that exists."
+      - id: d
+        text: "The policy did not match: it is disabled, lacks the event, or is in another project."
+        explanation: "Correct. No delivery was created, so the task logs have nothing."
+    correct_option: d
+    explanation: "Correct. No delivery was created, so the task logs have nothing."

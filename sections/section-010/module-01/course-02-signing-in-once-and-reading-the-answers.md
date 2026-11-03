@@ -1,49 +1,6 @@
-# The harbor CLI In A Script
+# Signing In Once And Reading The Answers
 
-A command you type yourself can ask you a question, and you answer it. A command in a pipeline cannot: there is no person and no terminal, so a question either hangs the job until it times out or fails it with an error that is hard to read. This part shows how the `harbor` command-line tool (CLI) keeps its sign-in, why a script should use a saved sign-in instead of signing in itself, and how a script reads the answers the CLI gives back.
-
-## Where the CLI keeps its sign-in
-
-The CLI does not ask for a password on every command. It signs in once and saves the result as a **context**: a name, the Harbor server address, the user name and the password. All contexts live in one configuration file, by default `~/.config/harbor-cli/config.yaml`, and one of them is the current context that every command uses.
-
-The workstation pod already has one context, called `admin`, that the bootstrap created. List the contexts the CLI knows. The `harbor` CLI (version 0.0.27) draws lists and views as a table only on a terminal, so this command runs through `wst`, which adds `-t` (a terminal) to `kubectl exec`:
-
-<!-- astrona:playground:renew -->
-
-```sh
-wst() { kubectl -n workstation exec -it deploy/workstation -- "$@"; }
-wst harbor context list
-```
-
-The list shows the context `admin` for the user `admin` at `https://harbor.localtest.me:8443`, marked as the current one. Now look at the file behind it:
-
-```sh
-ws cat /root/.config/harbor-cli/config.yaml
-```
-
-The file has the key `current-credential-name` and a list `credentials`, with one entry holding `name`, `username`, `password` and `serveraddress`. The password is not readable: it is a Base64 string of encrypted bytes. The CLI encrypts saved passwords with AES-GCM, a standard encryption algorithm, and it needs a key to do so.
-
-## The encryption key in a container
-
-The CLI looks for that key in three places, in this order. First it reads the environment variable `HARBOR_ENCRYPTION_KEY`. If that is not set, it uses the operating system's keyring, the protected store for secrets that macOS, Windows and Linux desktops provide. A container has no such keyring, so without the variable the CLI falls back to a key file under `~/.harbor/keyring/` and prints a warning; the CLI documentation calls this fallback less secure. For containers and CI jobs, set `HARBOR_ENCRYPTION_KEY`.
-
-The workstation pod gets its key from the Kubernetes Secret `harbor-cli-key`, which the bootstrap filled with 32 random bytes. Check that the variable is set, without printing it:
-
-```sh
-ws sh -c 'test -n "$HARBOR_ENCRYPTION_KEY" && echo "HARBOR_ENCRYPTION_KEY is set"'
-```
-
-The command prints the confirmation line. This is the pattern for a pipeline: the key comes from the CI system's secret store, so the configuration file on the runner is useless to anyone who copies it without the key.
-
-```mermaid
-flowchart LR
-    S["Secret: harbor-cli-key"] -->|"env"| C["harbor CLI"]
-    P["password typed at a prompt"] --> C
-    C -->|"AES-GCM"| F["config.yaml"]
-    C -->|"REST API"| H["Harbor core"]
-```
-
-The diagram shows the CLI taking the password from a person at a prompt and the key from the environment, writing only the encrypted password to its configuration file, and then calling Harbor's API.
+A command you type yourself can ask you a question, and you answer it. A command in a pipeline cannot: there is no person and no terminal, so a question either hangs the job until it times out or fails it with an error that is hard to read. This part shows why a script should use a saved sign-in instead of signing in itself, how to stop commands from waiting for input, and how a script reads the answers the CLI gives back.
 
 ## Signing in once, at a terminal
 
@@ -54,6 +11,8 @@ The name `--password-stdin` is misleading in CLI v0.0.27. Other tools such as `d
 So a script does not sign in at all. A person signs in once at a terminal and the CLI saves the context. The script then only selects that context with `harbor context switch`, which needs no password and no terminal.
 
 Sign in as the user `demo-dev` (lab-only password `Demo-Dev-2026`) into a new context. The `-t` flag of `kubectl exec` gives the command in the pod a terminal, so the prompt works. Type the password when the CLI asks for it:
+
+<!-- astrona:playground:renew -->
 
 ```sh
 kubectl -n workstation exec -it deploy/workstation -- harbor login https://harbor.localtest.me:8443 -u demo-dev --password-stdin -n demo-dev
@@ -104,7 +63,7 @@ ws harbor project view no-such-project -o json </dev/null >/dev/null 2>&1; echo 
 
 The first line prints exit `0` and the second a non-zero exit code. That is all a script needs to decide whether to create the project.
 
-You now know where the CLI keeps its sign-in, why a script selects a saved context with `harbor context switch` instead of calling `harbor login`, why a container needs `HARBOR_ENCRYPTION_KEY`, and how to read a command's JSON and exit code. The open question is how to combine these into a script that creates only what is missing, so that running it twice is safe.
+You now know why a script selects a saved context with `harbor context switch` instead of calling `harbor login`, how to keep a command from waiting for input, and how to read a command's JSON and exit code. The open question is how to find the right command and flags for a task, and which output format to ask for.
 
 ## Common pitfalls
 
@@ -112,6 +71,4 @@ You now know where the CLI keeps its sign-in, why a script selects a saved conte
 > - **Piping a password into `harbor login --password-stdin`.** In CLI v0.0.27 the flag opens a hidden prompt on a terminal and does not read a pipe. Without a terminal it fails with `inappropriate ioctl for device`. Sign in once at a terminal, and let the script run `harbor context switch`.
 > - **Calling `harbor login` in the script.** The script then needs the password, and with `-p` the password ends up in the script, the process list or the CI log. The script should only select a context that already exists.
 > - **Leaving out an argument.** The command opens an interactive form and the pipeline hangs. Give every argument and flag, and add `</dev/null`.
-> - **Running the CLI in a container without `HARBOR_ENCRYPTION_KEY`.** The CLI falls back to a key file under `~/.harbor/keyring/` and prints a warning. Inject the key from a secret store instead.
 > - **Parsing the table output with `grep` or `awk`.** Tables change between releases. Use `-o json` and `jq`.
-> - **Forgetting which context is current.** A login switches the current context. Run `harbor context list` when a command answers as the wrong user.

@@ -19,7 +19,7 @@ questions:
     difficulty: beginner
     learning_objective: "Explain what a harbor CLI context holds"
     source_readings:
-      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+      - sections/section-010/module-01/course-01-contexts-and-the-encryption-key.md
     prompt: "What does a context of the `harbor` CLI hold?"
     options:
       - id: a
@@ -42,7 +42,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Name where the CLI finds its encryption key"
     source_readings:
-      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+      - sections/section-010/module-01/course-01-contexts-and-the-encryption-key.md
     prompt: "Where does the `harbor` CLI look for its encryption key, in order?"
     options:
       - id: a
@@ -65,7 +65,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Explain why a piped password fails"
     source_readings:
-      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+      - sections/section-010/module-01/course-02-signing-in-once-and-reading-the-answers.md
     prompt: "A pipeline runs `echo \"$PW\" | harbor login ... --password-stdin` and fails with `inappropriate ioctl for device`. Why?"
     options:
       - id: a
@@ -88,7 +88,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Describe the risk of the -p flag"
     source_readings:
-      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+      - sections/section-010/module-01/course-02-signing-in-once-and-reading-the-answers.md
     prompt: "What is the risk of `harbor login -p <password>`?"
     options:
       - id: a
@@ -111,7 +111,7 @@ questions:
     difficulty: beginner
     learning_objective: "Prevent a script from waiting for input"
     source_readings:
-      - sections/section-010/module-01/course-01-the-cli-in-a-script.md
+      - sections/section-010/module-01/course-02-signing-in-once-and-reading-the-answers.md
     prompt: "A command in a script is missing a required argument. What happens, and what keeps the script safe?"
     options:
       - id: a
@@ -134,7 +134,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Use an exit code to test that a project exists"
     source_readings:
-      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - sections/section-010/module-01/course-04-idempotent-onboarding.md
     prompt: "How does an onboarding script test whether a project exists?"
     options:
       - id: a
@@ -157,7 +157,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Test membership with the JSON output"
     source_readings:
-      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - sections/section-010/module-01/course-04-idempotent-onboarding.md
     prompt: "Why does a script test membership with `jq -e` and not with the exit code of `harbor project member list`?"
     options:
       - id: a
@@ -180,7 +180,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Explain the storage limit flag"
     source_readings:
-      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - sections/section-010/module-01/course-04-idempotent-onboarding.md
     prompt: "Why does the script pass `--storage-limit -1` to `harbor project create`?"
     options:
       - id: a
@@ -203,7 +203,7 @@ questions:
     difficulty: advanced
     learning_objective: "Read the role number the CLI expects"
     source_readings:
-      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - sections/section-010/module-01/course-04-idempotent-onboarding.md
     prompt: "In CLI v0.0.27, `harbor project member create ... --roleid 1` is used. Which role does the user get?"
     options:
       - id: a
@@ -226,7 +226,7 @@ questions:
     difficulty: beginner
     learning_objective: "Prove that a script is idempotent"
     source_readings:
-      - sections/section-010/module-01/course-02-idempotent-onboarding.md
+      - sections/section-010/module-01/course-04-idempotent-onboarding.md
     prompt: "How do you prove that an onboarding script is idempotent?"
     options:
       - id: a

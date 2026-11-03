@@ -1,0 +1,246 @@
+# Knowledge check for section 020, module 02. Listed in astrona.yaml as a `type: quiz` entry after the module summary.
+schema_version: 1
+kind: question_bank
+id: ats104-020-m02
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: module-02
+  title: "Artifacts, Scans And The System API"
+placement:
+  position: after
+  reading: sections/section-020/module-02/course-05-summary.md
+questions:
+
+  - id: ats104-020-m02-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Encode a repository name with a slash"
+    source_readings:
+      - sections/section-020/module-02/course-01-artifact-paths-and-double-encoding.md
+    prompt: "The repository `web/frontend` is in the project `inventory`. Which path segment addresses it in an artifacts request?"
+    options:
+      - id: a
+        text: "`web%252Ffrontend`"
+        explanation: "Correct. The slash is encoded to `%2F` and the `%` is encoded again to `%25`."
+      - id: b
+        text: "`web/frontend`"
+        explanation: "Not correct. The extra slash adds a path segment that matches no endpoint."
+      - id: c
+        text: "`inventory/web/frontend`"
+        explanation: "Not correct. The project is named earlier in the path and is not part of the repository name."
+      - id: d
+        text: "`web%2Ffrontend`"
+        explanation: "Not correct. A single encoding fails behind a proxy that decodes it before routing."
+    correct_option: a
+    explanation: "Correct. The slash is encoded to `%2F` and the `%` is encoded again to `%25`."
+
+  - id: ats104-020-m02-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Encode a name in Python"
+    source_readings:
+      - sections/section-020/module-02/course-01-artifact-paths-and-double-encoding.md
+    prompt: "Which Python expression gives `web%252Ffrontend` for `web/frontend`?"
+    options:
+      - id: a
+        text: "`urllib.parse.quote(name)`"
+        explanation: "Not correct. By default `quote` keeps the slash as it is."
+      - id: b
+        text: "`urllib.parse.quote(name, safe=\"\")`"
+        explanation: "Not correct. That encodes once and gives `web%2Ffrontend`."
+      - id: c
+        text: "`name.replace(\"/\", \"%252F\")` applied to the project and repository"
+        explanation: "Not correct. The project name is not encoded this way and is not part of the repository name."
+      - id: d
+        text: "`urllib.parse.quote(urllib.parse.quote(name, safe=\"\"), safe=\"\")`"
+        explanation: "Correct. `safe=\"\"` makes `quote` encode the slash too."
+    correct_option: d
+    explanation: "Correct. `safe=\"\"` makes `quote` encode the slash too."
+
+  - id: ats104-020-m02-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose a stable reference"
+    source_readings:
+      - sections/section-020/module-02/course-01-artifact-paths-and-double-encoding.md
+    prompt: "A script reads an artifact by the tag `latest` and changes it a minute later by the same tag. What is the risk, and what is the fix?"
+    options:
+      - id: a
+        text: "The tag expires after one minute; renew it."
+        explanation: "Not correct. Tags do not expire."
+      - id: b
+        text: "Harbor locks the tag while the script runs; nothing is needed."
+        explanation: "Not correct. Harbor does not lock tags during a script."
+      - id: c
+        text: "The tag can move to another artifact in between; read the digest first and use it in later requests."
+        explanation: "Correct. A digest names the same artifact for ever."
+      - id: d
+        text: "The request fails with `409`; retry it."
+        explanation: "Not correct. A moved tag does not cause an error, it points to a different artifact."
+    correct_option: c
+    explanation: "Correct. A digest names the same artifact for ever."
+
+  - id: ats104-020-m02-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Know the status of a repeated tag create"
+    source_readings:
+      - sections/section-020/module-02/course-02-tags-copies-and-deletes.md
+    prompt: "A script posts the tag `release` to an artifact that already has it. Which status does Harbor answer?"
+    options:
+      - id: a
+        text: "`200`"
+        explanation: "Not correct. `200` is the status of a successful delete."
+      - id: b
+        text: "`409`"
+        explanation: "Correct. The first create answers `201` and a repeat answers `409`."
+      - id: c
+        text: "`201`"
+        explanation: "Not correct. `201` is only for a tag that was created."
+      - id: d
+        text: "`404`"
+        explanation: "Not correct. `404` means the path does not match an object."
+    correct_option: b
+    explanation: "Correct. The first create answers `201` and a repeat answers `409`."
+
+  - id: ats104-020-m02-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Treat a 404 on a delete with care"
+    source_readings:
+      - sections/section-020/module-02/course-02-tags-copies-and-deletes.md
+    prompt: "A delete of a tag answers `404`. Why should a script not always treat that as success?"
+    options:
+      - id: a
+        text: "It can mean the tag is already gone, and it can mean the path is wrong, for example a repository name encoded once."
+        explanation: "Correct. Read the object first when the difference matters."
+      - id: b
+        text: "`404` on a delete always means the tag is gone."
+        explanation: "Not correct. A wrong path gives the same status."
+      - id: c
+        text: "`404` means the user lacks permission."
+        explanation: "Not correct. A missing permission answers `403`."
+      - id: d
+        text: "`404` means Harbor is down."
+        explanation: "Not correct. A down Harbor gives no answer or a `5xx` status."
+    correct_option: a
+    explanation: "Correct. Read the object first when the difference matters."
+
+  - id: ats104-020-m02-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Copy an artifact between repositories"
+    source_readings:
+      - sections/section-020/module-02/course-02-tags-copies-and-deletes.md
+    prompt: "Which request copies `inventory/web/frontend:v1` into the repository `frontend-copy` of the project `archive`?"
+    options:
+      - id: a
+        text: "`PUT /projects/archive/repositories/frontend-copy/artifacts/v1`"
+        explanation: "Not correct. A `PUT` does not copy an artifact."
+      - id: b
+        text: "`POST /projects/inventory/repositories/web%252Ffrontend/artifacts?from=archive/frontend-copy:v1`"
+        explanation: "Not correct. That names the source as the target."
+      - id: c
+        text: "`GET /projects/archive/repositories/frontend-copy/artifacts?from=inventory/web/frontend:v1`"
+        explanation: "Not correct. A `GET` only reads."
+      - id: d
+        text: "`POST /projects/archive/repositories/frontend-copy/artifacts?from=inventory/web/frontend:v1`"
+        explanation: "Correct. The target is in the path and the source is in the `from` parameter."
+    correct_option: d
+    explanation: "Correct. The target is in the path and the source is in the `from` parameter."
+
+  - id: ats104-020-m02-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Wait for a scan correctly"
+    source_readings:
+      - sections/section-020/module-02/course-03-scans-and-vulnerability-reports.md
+    prompt: "A scan start answers `202`. What must the script do before it reads the findings?"
+    options:
+      - id: a
+        text: "Nothing; the findings are ready when the `202` arrives."
+        explanation: "Not correct. The scan runs in the background."
+      - id: b
+        text: "Send the same `POST` again until it answers `200`."
+        explanation: "Not correct. Repeating the start does not report progress."
+      - id: c
+        text: "Poll the scan overview until `scan_status` is `Success`, `Error` or `Stopped`, with a deadline."
+        explanation: "Correct. The `202` only says the scan was queued."
+      - id: d
+        text: "Wait for a garbage collection to finish."
+        explanation: "Not correct. Garbage collection has nothing to do with scans."
+    correct_option: c
+    explanation: "Correct. The `202` only says the scan was queued."
+
+  - id: ats104-020-m02-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Handle a failed scan in a gate"
+    source_readings:
+      - sections/section-020/module-02/course-03-scans-and-vulnerability-reports.md
+    prompt: "A gate passes when an artifact has no Critical findings. The scan status is `Error`. What should the gate do?"
+    options:
+      - id: a
+        text: "Pass, because there are no Critical findings."
+        explanation: "Not correct. The empty list comes from a scan that did not finish."
+      - id: b
+        text: "Fail, because an artifact whose scan failed has no findings only because nothing was checked."
+        explanation: "Correct. A failed scan is not a clean result."
+      - id: c
+        text: "Pass, but only for public projects."
+        explanation: "Not correct. Visibility does not change the meaning of the status."
+      - id: d
+        text: "Delete the artifact."
+        explanation: "Not correct. A failed scan is no reason to delete the artifact."
+    correct_option: b
+    explanation: "Correct. A failed scan is not a clean result."
+
+  - id: ats104-020-m02-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find out what garbage collection removes"
+    source_readings:
+      - sections/section-020/module-02/course-04-system-information-quotas-audit-logs-and-garbage-collection.md
+    prompt: "A pipeline deletes old artifacts, but the storage use of the project does not drop. What is missing?"
+    options:
+      - id: a
+        text: "A garbage collection, which removes blobs that no artifact uses."
+        explanation: "Correct. A delete removes the name, and GC returns the space."
+      - id: b
+        text: "A second delete request for each artifact."
+        explanation: "Not correct. The first delete already removed the artifact."
+      - id: c
+        text: "A scan of the project."
+        explanation: "Not correct. A scan reads artifacts and frees no space."
+      - id: d
+        text: "A change of the project quota."
+        explanation: "Not correct. The quota is a limit and does not free space."
+    correct_option: a
+    explanation: "Correct. A delete removes the name, and GC returns the space."
+
+  - id: ats104-020-m02-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Try garbage collection safely"
+    source_readings:
+      - sections/section-020/module-02/course-04-system-information-quotas-audit-logs-and-garbage-collection.md
+    prompt: "You want to see what a garbage collection would remove with `delete_untagged` on. What is the safe first step?"
+    options:
+      - id: a
+        text: "Start a real run and restore from the log."
+        explanation: "Not correct. A real run cannot be undone."
+      - id: b
+        text: "Delete the untagged artifacts by hand first."
+        explanation: "Not correct. That removes data without a preview."
+      - id: c
+        text: "Use a project robot account to run it."
+        explanation: "Not correct. Only an administrator can use the GC endpoints."
+      - id: d
+        text: "Start it with `dry_run` set to true and read the log of the run in the GC history."
+        explanation: "Correct. Start a real run only when the dry run shows what you expect."
+    correct_option: d
+    explanation: "Correct. Start a real run only when the dry run shows what you expect."

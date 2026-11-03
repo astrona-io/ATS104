@@ -1,0 +1,246 @@
+# Knowledge check for section 040, module 02. Listed in astrona.yaml as a `type: quiz` entry after the module summary.
+schema_version: 1
+kind: question_bank
+id: ats104-040-m02
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: module-02
+  title: "Receivers, Events And Troubleshooting"
+placement:
+  position: after
+  reading: sections/section-040/module-02/course-05-summary.md
+questions:
+
+  - id: ats104-040-m02-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the event for a deletion"
+    source_readings:
+      - sections/section-040/module-02/course-01-event-types-and-policy-design.md
+    prompt: "A receiver must know when an artifact is deleted. Which event type goes into the policy?"
+    options:
+      - id: a
+        text: "`DELETE_ARTIFACT`"
+        explanation: "Correct. The CloudEvents `type` of the delivery is `harbor.artifact.deleted`."
+      - id: b
+        text: "`PUSH_ARTIFACT`"
+        explanation: "Not correct. That fires when an artifact is pushed."
+      - id: c
+        text: "`harbor.artifact.deleted`"
+        explanation: "Not correct. That is the CloudEvents `type` in the payload, not the event type of the policy."
+      - id: d
+        text: "`TAG_RETENTION`"
+        explanation: "Not correct. That fires when a retention run finishes."
+    correct_option: a
+    explanation: "Correct. The CloudEvents `type` of the delivery is `harbor.artifact.deleted`."
+
+  - id: ats104-040-m02-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Place the pull event"
+    source_readings:
+      - sections/section-040/module-02/course-01-event-types-and-policy-design.md
+    prompt: "A busy cluster pulls images all day. Where should a `PULL_ARTIFACT` event go?"
+    options:
+      - id: a
+        text: "Into every policy, to be safe."
+        explanation: "Not correct. Each policy adds a delivery for every matching event."
+      - id: b
+        text: "Nowhere; Harbor cannot send it."
+        explanation: "Not correct. Harbor can send pull events."
+      - id: c
+        text: "Into the system configuration only."
+        explanation: "Not correct. A project policy is the way a team controls it."
+      - id: d
+        text: "Into a policy of its own, so the flood does not bury the other events."
+        explanation: "Correct. Choose it only when a receiver needs every pull."
+    correct_option: d
+    explanation: "Correct. Choose it only when a receiver needs every pull."
+
+  - id: ats104-040-m02-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Find the supported events"
+    source_readings:
+      - sections/section-040/module-02/course-01-event-types-and-policy-design.md
+    prompt: "Which request tells a script which events and notify types the Harbor version supports?"
+    options:
+      - id: a
+        text: "`GET /systeminfo`"
+        explanation: "Not correct. It shows the version and settings, not webhook events."
+      - id: b
+        text: "`GET /statistics`"
+        explanation: "Not correct. It shows counts."
+      - id: c
+        text: "`GET /projects/{project}/webhook/events`"
+        explanation: "Correct. The list depends on the version."
+      - id: d
+        text: "`GET /projects/{project}/logs`"
+        explanation: "Not correct. It lists past operations."
+    correct_option: c
+    explanation: "Correct. The list depends on the version."
+
+  - id: ats104-040-m02-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Create a policy idempotently"
+    source_readings:
+      - sections/section-040/module-02/course-02-managing-policies-with-the-rest-api.md
+    prompt: "A setup script creates the policy `audit-deletes` and runs twice. What is the safe way?"
+    options:
+      - id: a
+        text: "Always `PUT` an empty body."
+        explanation: "Not correct. A `PUT` needs the policy ID and the whole policy."
+      - id: b
+        text: "List the policies, and create the policy only when the name is missing."
+        explanation: "Correct. A second create answers `409`."
+      - id: c
+        text: "Delete all policies, then create."
+        explanation: "Not correct. That removes policies that other teams own."
+      - id: d
+        text: "Ignore the status code."
+        explanation: "Not correct. A script must tell success from failure."
+    correct_option: b
+    explanation: "Correct. A second create answers `409`."
+
+  - id: ats104-040-m02-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Test a target before going live"
+    source_readings:
+      - sections/section-040/module-02/course-02-managing-policies-with-the-rest-api.md
+    prompt: "How can you check that Harbor can reach a receiver without waiting for a real event?"
+    options:
+      - id: a
+        text: "Send a request to `POST /projects/{project}/webhook/policies/test` with the target."
+        explanation: "Correct. The answer and the receiver log show the result."
+      - id: b
+        text: "Push an artifact to another project."
+        explanation: "Not correct. A policy in a different project does not fire."
+      - id: c
+        text: "Read `lasttrigger`."
+        explanation: "Not correct. It shows past triggers only."
+      - id: d
+        text: "Restart jobservice."
+        explanation: "Not correct. A restart sends nothing to the receiver."
+    correct_option: a
+    explanation: "Correct. The answer and the receiver log show the result."
+
+  - id: ats104-040-m02-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Pause a policy"
+    source_readings:
+      - sections/section-040/module-02/course-02-managing-policies-with-the-rest-api.md
+    prompt: "A receiver is down for maintenance. How do you stop deliveries and keep the policy settings?"
+    options:
+      - id: a
+        text: "Delete the policy and create it again later."
+        explanation: "Not correct. A delete loses the settings and the ID."
+      - id: b
+        text: "Change the event type to `PULL_ARTIFACT`."
+        explanation: "Not correct. That changes what fires and does not stop it."
+      - id: c
+        text: "Send a `PUT` with only `enabled`."
+        explanation: "Not correct. A `PUT` replaces the whole policy, so fields left out are cleared."
+      - id: d
+        text: "Set `enabled` to false with a `PUT` that holds the whole policy."
+        explanation: "Correct. Set it back to true afterwards."
+    correct_option: d
+    explanation: "Correct. Set it back to true afterwards."
+
+  - id: ats104-040-m02-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Answer quickly in a receiver"
+    source_readings:
+      - sections/section-040/module-02/course-03-writing-a-receiver.md
+    prompt: "A receiver builds an image for every event before it answers. What goes wrong?"
+    options:
+      - id: a
+        text: "Nothing; Harbor waits for the build."
+        explanation: "Not correct. Harbor does not wait without a limit."
+      - id: b
+        text: "Harbor deletes the policy."
+        explanation: "Not correct. A slow receiver does not change the policy."
+      - id: c
+        text: "The request times out and Harbor sends the event again; accept and store first, and work after."
+        explanation: "Correct. A receiver should answer with a `2xx` status first."
+      - id: d
+        text: "The auth header becomes invalid."
+        explanation: "Not correct. The header does not expire."
+    correct_option: c
+    explanation: "Correct. A receiver should answer with a `2xx` status first."
+
+  - id: ats104-040-m02-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Handle repeated events"
+    source_readings:
+      - sections/section-040/module-02/course-03-writing-a-receiver.md
+    prompt: "A retry sends the same CloudEvents event twice. How does a receiver ignore the second one?"
+    options:
+      - id: a
+        text: "It answers `500` for the second one."
+        explanation: "Not correct. A `5xx` status makes Harbor try again."
+      - id: b
+        text: "It stores the event `id` and skips an `id` it has seen, in a store that survives a restart."
+        explanation: "Correct. A set in memory forgets everything on restart."
+      - id: c
+        text: "It compares the time of arrival."
+        explanation: "Not correct. Two deliveries can arrive at any time."
+      - id: d
+        text: "It cannot; Harbor never repeats an event."
+        explanation: "Not correct. Retries repeat events."
+    correct_option: b
+    explanation: "Correct. A set in memory forgets everything on restart."
+
+  - id: ats104-040-m02-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the right status"
+    source_readings:
+      - sections/section-040/module-02/course-03-writing-a-receiver.md
+    prompt: "A request arrives with a wrong auth header. Which status does the receiver return?"
+    options:
+      - id: a
+        text: "`401`"
+        explanation: "Correct. A `503` is for a temporary failure of the receiver."
+      - id: b
+        text: "`200`"
+        explanation: "Not correct. That tells Harbor the delivery worked."
+      - id: c
+        text: "`204`"
+        explanation: "Not correct. That also means success."
+      - id: d
+        text: "`503`"
+        explanation: "Not correct. That says the receiver is temporarily unable, which a wrong header is not."
+    correct_option: a
+    explanation: "Correct. A `503` is for a temporary failure of the receiver."
+
+  - id: ats104-040-m02-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Trace a missing webhook"
+    source_readings:
+      - sections/section-040/module-02/course-04-troubleshooting-a-webhook-that-does-not-arrive.md
+    prompt: "`lasttrigger` shows no recent time for `DELETE_ARTIFACT`, though artifacts were deleted. Where is the cause?"
+    options:
+      - id: a
+        text: "The receiver rejected the auth header."
+        explanation: "Not correct. That would show a delivery with an error status."
+      - id: b
+        text: "The cluster DNS has no host name."
+        explanation: "Not correct. That also needs a delivery that failed."
+      - id: c
+        text: "The receiver needs a certificate."
+        explanation: "Not correct. TLS errors appear in a delivery that exists."
+      - id: d
+        text: "The policy did not match: it is disabled, lacks the event, or is in another project."
+        explanation: "Correct. No delivery was created, so the task logs have nothing."
+    correct_option: d
+    explanation: "Correct. No delivery was created, so the task logs have nothing."

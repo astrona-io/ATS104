@@ -1,0 +1,246 @@
+# Knowledge check for section 010, module 02. Listed in astrona.yaml as a `type: quiz` entry after the module summary.
+schema_version: 1
+kind: question_bank
+id: ats104-010-m02
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: module-02
+  title: "Projects, Repositories And Artifacts With The CLI"
+placement:
+  position: after
+  reading: sections/section-010/module-02/course-05-summary.md
+questions:
+
+  - id: ats104-010-m02-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Create a project without the interactive form"
+    source_readings:
+      - sections/section-010/module-02/course-01-projects-with-the-cli.md
+    prompt: "A script runs `harbor project create team-x </dev/null` and the command does not finish its work as the script expects. Which flag avoids the interactive form?"
+    options:
+      - id: a
+        text: "Add `--storage-limit -1` (or a size) so the command has every answer it needs."
+        explanation: "Correct. Without a storage limit the CLI opens a form to ask for it."
+      - id: b
+        text: "Add `--private`."
+        explanation: "Not correct. A project is private by default, and the flag does not exist."
+      - id: c
+        text: "Add `--force`."
+        explanation: "Not correct. `--force` belongs to `harbor project delete`."
+      - id: d
+        text: "Add `-o json`."
+        explanation: "Not correct. The output format does not change which questions the command asks."
+    correct_option: a
+    explanation: "Correct. Without a storage limit the CLI opens a form to ask for it."
+
+  - id: ats104-010-m02-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Set the page size when listing repositories"
+    source_readings:
+      - sections/section-010/module-02/course-02-repositories-and-artifacts.md
+    prompt: "A project has 12 repositories. `harbor repo list inventory -o json` in a script returns 10. What fixes this?"
+    options:
+      - id: a
+        text: "Add `--public` to the command."
+        explanation: "Not correct. Visibility does not change the page size."
+      - id: b
+        text: "Run the command twice and merge the output."
+        explanation: "Not correct. Two runs return the same first page."
+      - id: c
+        text: "Use `--sort name`."
+        explanation: "Not correct. Sorting changes the order, not the number of rows per page."
+      - id: d
+        text: "Pass `--page-size 100` (and loop over `--page` for more)."
+        explanation: "Correct. The default page size of `harbor repo list` is 10."
+    correct_option: d
+    explanation: "Correct. The default page size of `harbor repo list` is 10."
+
+  - id: ats104-010-m02-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Filter projects by part of a value"
+    source_readings:
+      - sections/section-010/module-02/course-01-projects-with-the-cli.md
+    prompt: "Which flag of `harbor project list` selects projects whose name contains `inv`?"
+    options:
+      - id: a
+        text: "`--match name=inv`"
+        explanation: "Not correct. `--match` needs the whole value."
+      - id: b
+        text: "`--range name=inv`"
+        explanation: "Not correct. `--range` takes `key=min~max`."
+      - id: c
+        text: "`--fuzzy name=inv`"
+        explanation: "Correct. `--fuzzy` is a partial match and `--match` is an exact match."
+      - id: d
+        text: "`--public inv`"
+        explanation: "Not correct. `--public` is a switch for visibility and takes no value."
+    correct_option: c
+    explanation: "Correct. `--fuzzy` is a partial match and `--match` is an exact match."
+
+  - id: ats104-010-m02-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Delete a project that has repositories"
+    source_readings:
+      - sections/section-010/module-02/course-01-projects-with-the-cli.md
+    prompt: "What happens when you run `harbor project delete inventory` and the project still has repositories?"
+    options:
+      - id: a
+        text: "The project is deleted and its repositories move to `library`."
+        explanation: "Not correct. Harbor never moves repositories to another project."
+      - id: b
+        text: "Harbor refuses, unless you add `--force`, which deletes everything in the project first."
+        explanation: "Correct. `--force` is irreversible, so check the name before you use it."
+      - id: c
+        text: "Only the empty repositories are deleted."
+        explanation: "Not correct. A project with repositories is refused as a whole."
+      - id: d
+        text: "The CLI deletes the project in the background after a confirmation prompt."
+        explanation: "Not correct. There is no background deletion, and a script gets no prompt."
+    correct_option: b
+    explanation: "Correct. `--force` is irreversible, so check the name before you use it."
+
+  - id: ats104-010-m02-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name an artifact in a tag command"
+    source_readings:
+      - sections/section-010/module-02/course-03-tags-retention-and-immutable-tags.md
+    prompt: "Which command adds the tag `stable` to the artifact that has the tag `build-2` in `inventory/app`?"
+    options:
+      - id: a
+        text: "`harbor artifact tags create inventory/app/build-2 stable`"
+        explanation: "Correct. The artifact is `<project>/<repository>/<reference>`, followed by the new tag."
+      - id: b
+        text: "`harbor artifact tags create inventory/app:build-2 stable`"
+        explanation: "Not correct. The tag commands use a slash before the reference, not a colon."
+      - id: c
+        text: "`harbor artifact tags create stable inventory/app/build-2`"
+        explanation: "Not correct. The artifact comes first and the tag second."
+      - id: d
+        text: "`harbor tag create inventory/app build-2 stable`"
+        explanation: "Not correct. There is no such command; `harbor tag` holds the retention and immutable rules."
+    correct_option: a
+    explanation: "Correct. The artifact is `<project>/<repository>/<reference>`, followed by the new tag."
+
+  - id: ats104-010-m02-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use the digest to stay on one artifact"
+    source_readings:
+      - sections/section-010/module-02/course-02-repositories-and-artifacts.md
+    prompt: "A script examines an artifact by its tag and then deletes it by the same tag a minute later. Why is the digest safer than the tag?"
+    options:
+      - id: a
+        text: "A digest is shorter to type."
+        explanation: "Not correct. A digest is much longer than a tag."
+      - id: b
+        text: "A tag cannot be used in a delete command."
+        explanation: "Not correct. Delete commands accept a tag as the reference."
+      - id: c
+        text: "A digest is checked by the scanner and a tag is not."
+        explanation: "Not correct. The scanner works on the artifact whichever name you use."
+      - id: d
+        text: "A tag can be moved to a different artifact by a new push between the two commands; a digest always names the same artifact."
+        explanation: "Correct. The digest is a hash of the content."
+    correct_option: d
+    explanation: "Correct. The digest is a hash of the content."
+
+  - id: ats104-010-m02-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make a tag command safe to run twice"
+    source_readings:
+      - sections/section-010/module-02/course-03-tags-retention-and-immutable-tags.md
+    prompt: "Why does a script run `harbor artifact tags list` before `harbor artifact tags create ... stable`?"
+    options:
+      - id: a
+        text: "The list command makes Harbor create the tag faster."
+        explanation: "Not correct. The list command only reads."
+      - id: b
+        text: "The create command needs the list output as input."
+        explanation: "Not correct. It takes the artifact and the tag as arguments."
+      - id: c
+        text: "Creating a tag the artifact already has fails, so the script adds it only when it is missing."
+        explanation: "Correct. The same check before a delete avoids an error for a missing tag."
+      - id: d
+        text: "Harbor rejects a create without a list in the same minute."
+        explanation: "Not correct. Harbor has no such rule."
+    correct_option: c
+    explanation: "Correct. The same check before a delete avoids an error for a missing tag."
+
+  - id: ats104-010-m02-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Avoid a false exit code under set -e"
+    source_readings:
+      - sections/section-010/module-02/course-03-tags-retention-and-immutable-tags.md
+    prompt: "A script with `set -e` ends with `has_tag tmp && harbor artifact tags delete \"$ref\" tmp </dev/null`. The artifact has no `tmp` tag. What is the problem?"
+    options:
+      - id: a
+        text: "Nothing: the script exits with `0`."
+        explanation: "Not correct. The failed check is the status of the last command."
+      - id: b
+        text: "The last status is non-zero, so the script may stop with an error even though nothing is wrong; an `if` statement avoids it."
+        explanation: "Correct. A false check inside an `&&` list returns a non-zero status."
+      - id: c
+        text: "The delete command runs anyway."
+        explanation: "Not correct. The `&&` stops the delete when the check fails."
+      - id: d
+        text: "Harbor creates the missing tag."
+        explanation: "Not correct. The script never creates a tag here."
+    correct_option: b
+    explanation: "Correct. A false check inside an `&&` list returns a non-zero status."
+
+  - id: ats104-010-m02-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain an immutable tag rule"
+    source_readings:
+      - sections/section-010/module-02/course-03-tags-retention-and-immutable-tags.md
+    prompt: "An immutable tag rule matches `v*`. A pipeline retries a push of `v1.2.0` after a network error that happened after the first push stored the tag. What happens?"
+    options:
+      - id: a
+        text: "The second push is refused, because an immutable tag cannot be overwritten, moved or deleted."
+        explanation: "Correct. Pipelines should tag every build uniquely."
+      - id: b
+        text: "The second push replaces the first artifact."
+        explanation: "Not correct. Replacing is exactly what the rule forbids."
+      - id: c
+        text: "The second push succeeds only for the administrator."
+        explanation: "Not correct. The rule applies to every user."
+      - id: d
+        text: "Harbor deletes the old tag and keeps the new one."
+        explanation: "Not correct. Harbor never removes an immutable tag."
+    correct_option: a
+    explanation: "Correct. Pipelines should tag every build uniquely."
+
+  - id: ats104-010-m02-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a scan result correctly"
+    source_readings:
+      - sections/section-010/module-02/course-04-scans-and-vulnerabilities.md
+    prompt: "A gate script counts the findings of an artifact and passes when the count is `0`. What else must it check?"
+    options:
+      - id: a
+        text: "That the artifact has at least one tag."
+        explanation: "Not correct. A tag says nothing about the scan."
+      - id: b
+        text: "That the project is public."
+        explanation: "Not correct. Visibility has no effect on scan results."
+      - id: c
+        text: "That the CLI is signed in as the administrator."
+        explanation: "Not correct. Any user who can read the artifact can read its findings."
+      - id: d
+        text: "That the scan finished, because an artifact that was never scanned also has no findings."
+        explanation: "Correct. A scan that did not run is not a scan that found nothing."
+    correct_option: d
+    explanation: "Correct. A scan that did not run is not a scan that found nothing."

@@ -19,7 +19,7 @@ questions:
     difficulty: beginner
     learning_objective: "Read robot names"
     source_readings:
-      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+      - sections/section-030/module-01/course-01-robot-names-permissions-and-creation.md
     prompt: "Which names have the default forms of a project robot and a system robot?"
     options:
       - id: a
@@ -42,7 +42,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Quote a robot name in a shell"
     source_readings:
-      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+      - sections/section-030/module-01/course-02-using-a-robot.md
     prompt: "Why does a script put `'robot$ci+builder'` in single quotes?"
     options:
       - id: a
@@ -65,7 +65,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Give push together with pull"
     source_readings:
-      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+      - sections/section-030/module-01/course-02-using-a-robot.md
     prompt: "A CI robot has only the permission `repository` `push`, and its pushes fail. What is missing?"
     options:
       - id: a
@@ -88,7 +88,7 @@ questions:
     difficulty: beginner
     learning_objective: "Catch the secret at creation"
     source_readings:
-      - sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+      - sections/section-030/module-01/course-01-robot-names-permissions-and-creation.md
     prompt: "When does Harbor show a robot's secret?"
     options:
       - id: a
@@ -111,7 +111,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Choose least privilege"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-03-least-privilege-expiry-and-secret-storage.md
     prompt: "A cluster only pulls images from `inventory`. Which permissions does its robot get?"
     options:
       - id: a
@@ -134,7 +134,7 @@ questions:
     difficulty: beginner
     learning_objective: "Read the duration"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-03-least-privilege-expiry-and-secret-storage.md
     prompt: "What does `duration: -1` mean for a robot?"
     options:
       - id: a
@@ -157,7 +157,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Respond fast to a suspected leak"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-04-rotating-a-robot-secret.md
     prompt: "What is the fastest way to stop all use of a robot's secret and keep its ID and history?"
     options:
       - id: a
@@ -180,7 +180,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Rotate a secret in place"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-04-rotating-a-robot-secret.md
     prompt: "How do you rotate the secret of a robot without changing its ID?"
     options:
       - id: a
@@ -203,7 +203,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Finish a rotation"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-04-rotating-a-robot-secret.md
     prompt: "After the secret is refreshed, what must you still do?"
     options:
       - id: a
@@ -226,7 +226,7 @@ questions:
     difficulty: advanced
     learning_objective: "Change a robot with PUT"
     source_readings:
-      - sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+      - sections/section-030/module-01/course-03-least-privilege-expiry-and-secret-storage.md
     prompt: "You change a robot's permissions with `PUT /api/v2.0/robots/<id>`. What is the safe way?"
     options:
       - id: a

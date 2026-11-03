@@ -1,6 +1,6 @@
-# Webhook Policies And Payloads
+# Webhook Policies And The Default Payload
 
-A pipeline that should react to a push needs three things from Harbor: a request at the right moment, at the right address, with enough information to act on. A webhook policy decides all three. This part creates a policy, pushes an artifact, and reads the request Harbor sends, first in Harbor's own payload format and then in the CloudEvents format.
+A pipeline that should react to a push needs three things from Harbor: a request at the right moment, at the right address, with enough information to act on. A webhook policy decides all three. This part shows what a policy holds, creates one with the `harbor` CLI, pushes an artifact, and reads the request that Harbor sends in its own Default payload format.
 
 ## What a webhook policy holds
 
@@ -76,47 +76,40 @@ The end of the log shows the last request: a `POST` to the path `/harbor` with t
 
 A pipeline needs `resource_url` or the repository name plus the digest; that is enough to deploy exactly the artifact that was pushed.
 
-## The CloudEvents format
-
-**CloudEvents** is a CNCF specification for describing events in one common shape, so tools that consume events from many sources can read them all the same way. Harbor's CloudEvents payload puts the event's metadata in standard fields and the Default payload's `event_data` in `data`.
-
-The CLI sets the payload format when it creates a policy; to see both side by side, create a second policy through the REST API. Save this as `webhook-policy-cloudevents.json` on your machine:
-
-```json
-{
-  "name": "notify-cloudevents",
-  "description": "Push events in the CloudEvents format",
-  "enabled": true,
-  "event_types": ["PUSH_ARTIFACT"],
-  "targets": [
-    {
-      "type": "http",
-      "address": "http://echo.hooks.svc.cluster.local:8080/cloudevents",
-      "auth_header": "Bearer demo-token",
-      "skip_cert_verify": false,
-      "payload_format": "CloudEvents"
-    }
-  ]
-}
-```
-
-Send it, push a second tag, and read the request that arrives at `/cloudevents`:
-
-```sh
-ws sh -c 'curl -s -o /dev/null -w "%{http_code}\n" -u admin:Harbor12345 -H "Content-Type: application/json" --data-binary @- "$HARBOR_URL/api/v2.0/projects/inventory/webhook/policies"' < webhook-policy-cloudevents.json
-ws sh -c 'cd /tmp && oras push harbor.localtest.me:8443/inventory/hello:v2 hello.txt'
-receiver_log | tail -n 160
-```
-
-The `POST` to the policies endpoint returns `201`. Find the request to the path `/cloudevents` near the end of the log. Its body has the CloudEvents fields `specversion`, `id`, `requestid`, `source`, `type` (`harbor.artifact.pushed`), `datacontenttype`, `time` and `operator`, and `data` holds the same `resources` and `repository` as before. The push to `v2` also sent a Default request to `/harbor`, because both policies listen for `PUSH_ARTIFACT`.
-
-You can now create a webhook policy, choose its events, read both payload formats, and recognise the auth header in the request. The open question is what happens when the receiver is down or unreachable, and how to find out why a webhook never arrived.
+You can now create a webhook policy, choose its events, and read the Default payload and the auth header in the request. The open question is how the same event looks in the CloudEvents format, and when to choose it.
 
 ## Common pitfalls
 
 > [!WARNING]
 > - **Reading only the policy to check a webhook.** A policy can be correct and still fail to deliver. Watch the request arrive.
 > - **Not checking the auth header in the receiver.** Without that check, anyone who can reach the endpoint can start your pipeline.
-> - **Expecting the Default `type` in a CloudEvents consumer.** The event is `harbor.artifact.pushed` there, not `PUSH_ARTIFACT`.
 > - **Leaving out flags on `harbor webhook create`.** It opens its interactive form and a script hangs.
 > - **Forgetting the system-wide switch.** If webhooks are turned off in the system settings, no project policy sends anything.
+
+## Your mission: Notify A Pipeline When An Artifact Is Pushed
+
+You can now create a webhook policy, prove its delivery, and debug a delivery that fails. The graded lab asks you to create the policy `notify-ci` in `inventory`, which sends `PUSH_ARTIFACT` events in the Default format to the receiver with the auth header `Bearer pipeline-token-123`, and to prove that a push reaches it.
+
+The lab runs in its own cluster, so first pause your playground. Nothing in it is lost:
+
+```sh
+astrona stop ats-104-playground-040-01
+```
+
+Then start the lab:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS104.git -c sections/section-040/module-01/labs/lab-01
+```
+
+The task is on the next page. Solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-040/module-01/labs/lab-01
+```
+
+When the lab is done, remove it and start your playground again:
+
+```sh
+astrona destroy ats-104-lab-040-01
+astrona start ats-104-playground-040-01

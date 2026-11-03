@@ -226,7 +226,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Keep TLS verification on in Python"
     source_readings:
-      - sections/section-020/module-01/course-03-a-python-script-with-the-standard-library.md
+      - sections/section-020/module-01/course-04-a-python-script-with-the-standard-library.md
     prompt: "How does the Python script talk to Harbor with a certificate from Harbor's own certificate authority?"
     options:
       - id: a

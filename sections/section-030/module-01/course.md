@@ -4,7 +4,7 @@ A CI job that pushes to the project `ci` with the administrator's password can a
 
 A **robot account** is a non-human Harbor account for scripts and pipelines. It has a name, a secret that acts as its password, a lifetime, and a list of permissions. It cannot sign in to the portal. This module is about creating robots that hold exactly what their job needs. Keep one sentence in mind: **a robot's permissions are the damage its secret can do when it leaks.**
 
-The module has two parts. **Project Robots And System Robots** explains the two kinds of robot, their names, and how permissions are written, and creates a robot with the CLI and with the REST API. **Least Privilege, Expiry And Rotation** cuts a robot down to what its job needs, stores its secret in Kubernetes, uses it with `oras`, and refreshes the secret. A graded lab follows the second part.
+The module has four parts. **Robot Names, Permissions And Creation** explains the two kinds of robot, their names and how permissions are written, and creates a robot with the CLI and with the REST API. **Using A Robot** signs in with a robot in `oras` and the CLI. **Least Privilege, Expiry And Secret Storage** cuts a robot down to what its job needs and stores its secret in Kubernetes. **Rotating A Robot Secret** refreshes a secret and proves the old one stops working. A graded lab follows the third part.
 
 ## Learning objectives
 

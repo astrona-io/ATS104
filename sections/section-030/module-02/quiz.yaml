@@ -1,0 +1,246 @@
+# Knowledge check for section 030, module 02. Listed in astrona.yaml as a `type: quiz` entry after the module summary.
+schema_version: 1
+kind: question_bank
+id: ats104-030-m02
+course_id: ATS104
+exam_code: HARBOR
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: module-02
+  title: "System Robots, Lifecycle And Auditing"
+placement:
+  position: after
+  reading: sections/section-030/module-02/course-05-summary.md
+questions:
+
+  - id: ats104-030-m02-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the robot level for several projects"
+    source_readings:
+      - sections/section-030/module-02/course-01-system-robots-and-their-permissions.md
+    prompt: "One robot must pull from `team-red` and `team-blue`. Which kind of robot can do that?"
+    options:
+      - id: a
+        text: "A system robot, created with `\"level\": \"system\"` and one permission entry for each project."
+        explanation: "Correct. A project robot holds permissions for its own project only."
+      - id: b
+        text: "A project robot in `team-red`."
+        explanation: "Not correct. A project robot cannot hold permissions for another project."
+      - id: c
+        text: "A user account with the role Guest."
+        explanation: "Not correct. A user account is not a robot, and it signs in with a password."
+      - id: d
+        text: "Two project robots that share one secret."
+        explanation: "Not correct. Each robot has its own secret."
+    correct_option: a
+    explanation: "Correct. A project robot holds permissions for its own project only."
+
+  - id: ats104-030-m02-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read the name of a system robot"
+    source_readings:
+      - sections/section-030/module-02/course-01-system-robots-and-their-permissions.md
+    prompt: "A system robot is created with the name `puller`. What is its full name with the default prefix?"
+    options:
+      - id: a
+        text: "`robot$system+puller`"
+        explanation: "Not correct. The plus sign and a project part belong to project robots."
+      - id: b
+        text: "`puller`"
+        explanation: "Not correct. The prefix `robot$` is added."
+      - id: c
+        text: "`robot$team-red+puller`"
+        explanation: "Not correct. That is the form of a project robot in `team-red`."
+      - id: d
+        text: "`robot$puller`"
+        explanation: "Correct. A system robot has no project part in its name."
+    correct_option: d
+    explanation: "Correct. A system robot has no project part in its name."
+
+  - id: ats104-030-m02-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Judge the wildcard namespace"
+    source_readings:
+      - sections/section-030/module-02/course-01-system-robots-and-their-permissions.md
+    prompt: "A system robot has the permission `repository:pull` with the namespace `*`. Which statement is true?"
+    options:
+      - id: a
+        text: "It can pull only from public projects."
+        explanation: "Not correct. The wildcard covers private projects too."
+      - id: b
+        text: "It can pull from the projects that exist today, not later ones."
+        explanation: "Not correct. Later projects are covered as soon as they are created."
+      - id: c
+        text: "It can pull from every project, including projects created later."
+        explanation: "Correct. Name the projects unless the job needs all of them."
+      - id: d
+        text: "It is the same as an administrator account."
+        explanation: "Not correct. It has only the listed resource and action."
+    correct_option: c
+    explanation: "Correct. Name the projects unless the job needs all of them."
+
+  - id: ats104-030-m02-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Update a robot with PUT"
+    source_readings:
+      - sections/section-030/module-02/course-02-the-lifecycle-of-a-robot.md
+    prompt: "Why should a script read a robot before it sends a `PUT`?"
+    options:
+      - id: a
+        text: "The `PUT` needs the current secret in its body."
+        explanation: "Not correct. The secret does not change with a `PUT`."
+      - id: b
+        text: "The `PUT` replaces the whole definition, so a body with fewer permissions removes the rest."
+        explanation: "Correct. Read the robot, edit that copy and send it back."
+      - id: c
+        text: "Harbor refuses a `PUT` without a prior `GET` in the same minute."
+        explanation: "Not correct. Harbor has no such rule."
+      - id: d
+        text: "The `PUT` changes only the fields that you send."
+        explanation: "Not correct. That describes a merge, which `PUT` does not do."
+    correct_option: b
+    explanation: "Correct. Read the robot, edit that copy and send it back."
+
+  - id: ats104-030-m02-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Respond to a suspected leak"
+    source_readings:
+      - sections/section-030/module-02/course-02-the-lifecycle-of-a-robot.md
+    prompt: "A robot secret may have leaked. What is the safest first response that can be undone?"
+    options:
+      - id: a
+        text: "Disable the robot, then refresh the secret and enable it again."
+        explanation: "Correct. Disabling stops all use at once and keeps the robot."
+      - id: b
+        text: "Delete the robot at once."
+        explanation: "Not correct. A delete cannot be undone, and it removes the robot ID the audit trail refers to."
+      - id: c
+        text: "Wait for the robot to expire."
+        explanation: "Not correct. The secret stays usable until then."
+      - id: d
+        text: "Change the description of the robot."
+        explanation: "Not correct. The description does not affect the secret."
+    correct_option: a
+    explanation: "Correct. Disabling stops all use at once and keeps the robot."
+
+  - id: ats104-030-m02-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Find the expiry of a robot"
+    source_readings:
+      - sections/section-030/module-02/course-02-the-lifecycle-of-a-robot.md
+    prompt: "Which field of a robot tells a script when it expires?"
+    options:
+      - id: a
+        text: "`creation_time` alone."
+        explanation: "Not correct. The creation time does not include the lifetime."
+      - id: b
+        text: "`disable`"
+        explanation: "Not correct. That flag says whether the robot is switched off."
+      - id: c
+        text: "`level`"
+        explanation: "Not correct. The level says system or project."
+      - id: d
+        text: "`expires_at`, a Unix time, where `-1` means it never expires."
+        explanation: "Correct. `duration` is the lifetime in days set at creation."
+    correct_option: d
+    explanation: "Correct. `duration` is the lifetime in days set at creation."
+
+  - id: ats104-030-m02-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Filter the audit log by account"
+    source_readings:
+      - sections/section-030/module-02/course-03-auditing-what-a-robot-did.md
+    prompt: "Which `q` value finds the events of the account `robot$puller` in `/audit-logs`?"
+    options:
+      - id: a
+        text: "`q=username=robot$puller`"
+        explanation: "Not correct. The unencoded characters can be changed by the shell or the server."
+      - id: b
+        text: "`q=robot$puller`"
+        explanation: "Not correct. The filter needs a field name."
+      - id: c
+        text: "`q=username%3Drobot%24puller`"
+        explanation: "Correct. `=` is written `%3D` and `$` is written `%24` in the query string."
+      - id: d
+        text: "`sort=username`"
+        explanation: "Not correct. `sort` changes the order and selects nothing."
+    correct_option: c
+    explanation: "Correct. `=` is written `%3D` and `$` is written `%24` in the query string."
+
+  - id: ats104-030-m02-q08
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose the right log for a team"
+    source_readings:
+      - sections/section-030/module-02/course-03-auditing-what-a-robot-did.md
+    prompt: "A project administrator wants to see who deleted a tag in their project. Which endpoint is the right place?"
+    options:
+      - id: a
+        text: "`/systeminfo`"
+        explanation: "Not correct. It shows the version and the configuration."
+      - id: b
+        text: "`/projects/{project_name}/logs`"
+        explanation: "Correct. It lists the operations on that project and needs no system rights."
+      - id: c
+        text: "`/statistics`"
+        explanation: "Not correct. It shows counts, not events."
+      - id: d
+        text: "`/quotas`"
+        explanation: "Not correct. It shows storage limits and use."
+    correct_option: b
+    explanation: "Correct. It lists the operations on that project and needs no system rights."
+
+  - id: ats104-030-m02-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Build a pull Secret"
+    source_readings:
+      - sections/section-030/module-02/course-04-robots-in-pipelines-and-kubernetes-pull-secrets.md
+    prompt: "Which command creates a Kubernetes Secret that a pod can use as `imagePullSecrets`?"
+    options:
+      - id: a
+        text: "`kubectl create secret docker-registry harbor-pull --docker-server=... --docker-username=... --docker-password=...`"
+        explanation: "Correct. It creates a Secret of type `kubernetes.io/dockerconfigjson`."
+      - id: b
+        text: "`kubectl create secret generic harbor-pull --from-literal=password=...`"
+        explanation: "Not correct. A generic Secret is not in the format that the kubelet reads for a registry."
+      - id: c
+        text: "`kubectl create configmap harbor-pull --from-literal=password=...`"
+        explanation: "Not correct. A ConfigMap is not a Secret and cannot hold registry credentials safely."
+      - id: d
+        text: "`kubectl label secret harbor-pull pull=true`"
+        explanation: "Not correct. A label does not create credentials."
+    correct_option: a
+    explanation: "Correct. It creates a Secret of type `kubernetes.io/dockerconfigjson`."
+
+  - id: ats104-030-m02-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Diagnose an image pull failure"
+    source_readings:
+      - sections/section-030/module-02/course-04-robots-in-pipelines-and-kubernetes-pull-secrets.md
+    prompt: "New pods fail with `ImagePullBackOff` and the event says `unauthorized`, but running pods are fine. What is the likely cause?"
+    options:
+      - id: a
+        text: "The robot has no permission on the project."
+        explanation: "Not correct. That gives a `denied` message, not `unauthorized`."
+      - id: b
+        text: "The pod is in the wrong namespace of Harbor."
+        explanation: "Not correct. Harbor has projects, not namespaces for pods."
+      - id: c
+        text: "The image is too large."
+        explanation: "Not correct. Size does not cause an authentication error."
+      - id: d
+        text: "The robot secret in the pull Secret expired or was refreshed, and only new pulls notice."
+        explanation: "Correct. Running pods have already pulled their images."
+    correct_option: d
+    explanation: "Correct. Running pods have already pulled their images."

@@ -1,4 +1,4 @@
-# Delivery, Retries And CI Integration
+# Reading A Failed Delivery
 
 A webhook that does not arrive gives no error anywhere you would look: the push succeeded, the policy is enabled, and the pipeline simply never starts. To find out what happened, you need to know which Harbor component sends webhooks, where it records each attempt, and how it retries. This part breaks a delivery on purpose, reads why it failed, and then connects Harbor's webhooks to real CI systems.
 
@@ -75,67 +75,12 @@ The log shows the request to `https://echo.hooks.svc.cluster.local:8443/secure` 
 
 There are two correct fixes, and both are decisions, not workarounds. Inside a cluster, a plain HTTP endpoint on the cluster network is often acceptable, and the auth header still proves the sender. For an endpoint outside the cluster, use a certificate from an authority Harbor trusts. Setting `skip_cert_verify` to `true` makes the delivery work, but then Harbor sends the auth header to whoever answers at that address, so use it only for endpoints you control on a network you trust.
 
-## Retries and timeouts
 
-`jobservice` retries a failed webhook a limited number of times, with a timeout for each request. Both are set when Harbor is installed. With the `harbor-helm` chart they are `jobservice.notification.webhook_job_max_retry` and `jobservice.notification.webhook_job_http_client_timeout` (in seconds); with the Docker Compose installer they sit under `notification:` in `harbor.yml`. The documentation's example uses 3 retries and a 3-second timeout. More retries mean more load on the job queue, and a slow receiver should answer at once and do its work afterwards instead of raising the timeout.
-
-## Connecting to CI systems
-
-A CI system receives Harbor's webhook in one of two ways.
-
-Jenkins, with the Generic Webhook Trigger plugin, accepts any JSON POST at `/generic-webhook-trigger/invoke` and maps fields of the body into job variables with JSONPath expressions, for example `$.event_data.resources[0].resource_url` from a Default payload. A token in the URL or a header selects the job. Harbor's endpoint is then the Jenkins URL, and the auth header can carry the token.
-
-GitHub Actions starts a workflow on a `repository_dispatch` event, which GitHub accepts only in its own format, `{"event_type": "...", "client_payload": {...}}`, with a GitHub token. Harbor's payload does not have that shape, so a small relay sits between them: it receives Harbor's webhook, checks the auth header, and calls GitHub's API with the artifact's details in `client_payload`. The workflow then reads them:
-
-```yaml
-on:
-  repository_dispatch:
-    types: [harbor-artifact-pushed]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Deploying ${{ github.event.client_payload.resource_url }}"
-```
-
-The same relay pattern works for any system that wants its own request format: Harbor sends one well-known payload, and a small piece of code translates it.
-
-You can now follow a webhook from the push through `jobservice` to the receiver, read why a delivery failed from the task log, choose between the fixes for an untrusted certificate, and connect Harbor to Jenkins and GitHub Actions.
+You can now follow a webhook from the push through `jobservice` to the receiver, and read why a delivery failed from the execution and the task log. The open question is how often `jobservice` tries again, and how a receiver should behave so that retries do no harm.
 
 ## Common pitfalls
 
 > [!WARNING]
 > - **Looking for webhook errors in the push.** The push succeeds whatever happens to the webhook. Read the policy's executions and task logs.
 > - **Turning on `skip_cert_verify` everywhere.** Harbor then sends the auth header to any server at that address. Use a trusted certificate or a cluster-internal HTTP endpoint.
-> - **A receiver that does its work before answering.** It times out, `jobservice` retries, and the pipeline starts twice. Answer at once, then work.
-> - **Pointing Harbor straight at GitHub's dispatch API.** The payload has the wrong shape. Use a relay.
 > - **Reading the receiver log once.** Delivery takes a moment; wait and read again.
-
-## Your mission: Notify A Pipeline When An Artifact Is Pushed
-
-You can now create a webhook policy, prove its delivery, and debug a delivery that fails. The graded lab asks you to create the policy `notify-ci` in `inventory`, which sends `PUSH_ARTIFACT` events in the Default format to the receiver with the auth header `Bearer pipeline-token-123`, and to prove that a push reaches it.
-
-The lab runs in its own cluster, so first pause your playground. Nothing in it is lost:
-
-```sh
-astrona stop ats-104-playground-040-01
-```
-
-Then start the lab:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS104.git -c sections/section-040/module-01/labs/lab-01
-```
-
-The task is on the next page. Solve it on your own first. When you think you are done, send it for grading:
-
-```sh
-astrona submit -c sections/section-040/module-01/labs/lab-01
-```
-
-When the lab is done, remove it and start your playground again:
-
-```sh
-astrona destroy ats-104-lab-040-01
-astrona start ats-104-playground-040-01
-```

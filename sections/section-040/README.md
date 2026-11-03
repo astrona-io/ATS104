@@ -14,18 +14,31 @@ This section teaches webhooks the way a pipeline depends on them. You create a w
 - How `jobservice` delivers webhooks, retries failures, and logs each attempt.
 - Why an HTTPS endpoint with a certificate Harbor does not trust fails, and what to do about it.
 - How GitHub Actions and Jenkins receive Harbor's webhooks.
+- Event types, managing policies through the REST API, writing a receiver, and troubleshooting a webhook that does not arrive.
 
 ## The learning path
 
-The module has a landing page, two parts, a graded lab right after the part it tests, and a summary. The landing page starts the module's playground.
+Each module has a landing page, four parts, a graded lab right after the part it tests, and a summary. The landing page starts the module's playground, a cluster where you can explore freely.
 
 ### 1. Trigger Pipelines With Harbor Webhooks
 
 The playground holds Harbor with the project `inventory` and a webhook receiver, `echo`, in the namespace `hooks`, which writes every request it gets to its log.
 
-1. Webhook Policies And Payloads
-2. Delivery, Retries And CI Integration, followed by the lab **Notify A Pipeline When An Artifact Is Pushed**
-3. Summary
+1. Webhook Policies And The Default Payload, followed by the lab **Notify A Pipeline When An Artifact Is Pushed**
+2. The CloudEvents Payload
+3. Reading A Failed Delivery
+4. Retries, Receivers And CI Systems
+5. Summary
+
+### 2. Receivers, Events And Troubleshooting
+
+The playground for module 2 holds Harbor with the project `inventory` and the webhook receiver `echo` in the namespace `hooks`.
+
+1. Event Types And Policy Design
+2. Managing Policies With The REST API
+3. Writing A Receiver
+4. Troubleshooting A Webhook That Does Not Arrive, followed by the lab **Audit Deleted Artifacts With A CloudEvents Webhook**
+5. Summary
 
 ## Section capstone: Bootstrap A CI Project End To End
 

@@ -4,7 +4,7 @@ A deploy pipeline that checks Harbor for new images every five minutes is slow, 
 
 That request is a **webhook**, and the project setting that decides when and where to send it is a **webhook policy**. This module is about policies that a pipeline can rely on. Keep one sentence in mind: **Harbor's `jobservice` sends webhooks in the background, so you prove one works by watching it arrive, not by reading the policy.**
 
-The module has two parts. **Webhook Policies And Payloads** creates a policy, pushes an artifact, and reads the request in the receiver's log in both payload formats. **Delivery, Retries And CI Integration** follows a webhook through `jobservice`, reads the execution log of a failed delivery, and connects Harbor to GitHub Actions and Jenkins. A graded lab follows the second part.
+The module has four parts. **Webhook Policies And The Default Payload** creates a policy, pushes an artifact and reads the request in the receiver's log. **The CloudEvents Payload** compares the second format with the first. **Reading A Failed Delivery** follows a webhook through `jobservice` and reads the execution log of a failed delivery. **Retries, Receivers And CI Systems** covers retries, what a good receiver does, and GitHub Actions and Jenkins. A graded lab follows the first part.
 
 ## Learning objectives
 

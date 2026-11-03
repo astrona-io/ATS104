@@ -1,4 +1,4 @@
-# Project Robots And System Robots
+# Robot Names, Permissions And Creation
 
 A pipeline needs an identity that is not a person: one that does not leave the company, has no portal password, and can do only its job. Harbor gives it a robot account. This part explains the two kinds of robot, how Harbor names them, how their permissions are written, and how to create one and catch its secret the only time Harbor shows it.
 
@@ -67,40 +67,7 @@ The response holds the robot's `id`, its full `name`, `robot$inventory+reader`, 
 READER_SECRET="$(printf '%s' "$RESPONSE" | ws jq -r '.secret')"
 ```
 
-## Using the robot
-
-Sign `oras` in as the robot with a separate configuration file, so the administrator's sign-in in the workstation stays as it is, and read the manifest of the artifact in `inventory`:
-
-```sh
-printf '%s' "$READER_SECRET" | ws oras login --registry-config /tmp/reader.json -u 'robot$inventory+reader' --password-stdin harbor.localtest.me:8443
-ws oras manifest fetch --registry-config /tmp/reader.json harbor.localtest.me:8443/inventory/notes:v1
-```
-
-The login succeeds and the manifest prints as JSON. The robot did what its permission allows. Now try to pull from the project `ci`, where it has no permission:
-
-```sh
-ws oras manifest fetch --registry-config /tmp/reader.json harbor.localtest.me:8443/ci/app:latest
-```
-
-`oras` reports that the request was refused as unauthorized. Harbor's token service gave the robot no access to `ci`, so it does not even learn whether `ci/app` exists. The robot's reach ends at its project.
-
-## The same with the harbor CLI
-
-The `harbor` CLI creates project robots with `harbor project robot create`. Without flags it opens an interactive form. For a script, it reads the same information from a YAML or JSON file given with `--robot-config-file`:
-
-```yaml
-name: reader
-description: Reads inventory for the nightly report
-duration: 7
-project: inventory
-permissions:
-  - resource: repository
-    actions: ["pull"]
-```
-
-The CLI also offers `--all-permission`, which gives the robot every permission in the project. That flag is the opposite of what a pipeline needs. `harbor project robot list` and `harbor project robot view` show existing robots, and `harbor robot create` makes system robots.
-
-You can now tell project robots from system robots, read a robot's name, write its permissions as resource and action pairs, create one, and catch its secret. The open question is how to choose the permissions, how long a robot should live, and what to do when its secret leaks.
+You can now tell project robots from system robots, read a robot's name, write its permissions as resource and action pairs, create one through the API, and catch its secret. The open question is how a client uses the robot: how it signs in to the registry, what it can reach, and how the `harbor` CLI creates the same robot from a file.
 
 ## Common pitfalls
 
@@ -109,4 +76,3 @@ You can now tell project robots from system robots, read a robot's name, write i
 > - **Unquoted robot names in a shell.** `robot$ci+builder` becomes `robot+builder` because the shell expands `$ci`. Always use single quotes.
 > - **Push without pull.** A push-only robot fails; give `repository` `pull` with `push`.
 > - **Using `--all-permission` "for now".** It stays that way. Write the permissions the job needs.
-> - **Signing a tool in as the robot in its default configuration.** It replaces the sign-in other commands rely on. Use a separate configuration file, such as `oras --registry-config`.

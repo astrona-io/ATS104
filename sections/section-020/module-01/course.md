@@ -4,7 +4,7 @@ A report of every repository in a project sounds like one request. With the defa
 
 The REST API is Harbor's HTTP interface under `/api/v2.0`. The portal and the `harbor` command-line tool are both clients of it. This module teaches it the way a script uses it. Keep one sentence in mind: **a list endpoint returns one page, and the headers say how many items there are in total.**
 
-The module has three parts. **Base Path, Authentication And Errors** sends the first requests with `curl`, with and without credentials, and reads Harbor's error format. **Pages, Filters And Sorting** reads the `X-Total-Count` and `Link` headers, changes the page size, and filters and sorts on the server. **A Python Script With The Standard Library** turns that into a script that reads every page with TLS verification on. A graded lab follows the third part.
+The module has four parts. **Base Path, Authentication And Errors** sends the first requests with `curl`, with and without credentials, and reads Harbor's error format. **Pages, Filters And Sorting** reads the `X-Total-Count` and `Link` headers, changes the page size, and filters and sorts on the server. **Creating, Changing And Deleting** shows the status codes of writes and how to make them safe to repeat. **A Python Script With The Standard Library** turns the requests into a script that keeps TLS verification on. A graded lab follows the last part.
 
 ## Learning objectives
 

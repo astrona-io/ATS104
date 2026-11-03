@@ -1,0 +1,66 @@
+# Promote A Build With Tags
+# Astrona graded lab. Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-lab-010-02"
+  docs:
+    guide: "solution.md"
+    solution: "solution.md"
+    question: "question.md"
+    examQuestion: "question.md"
+    prerequisites: "prerequisites.md"
+bootstrap:
+  init:
+    - name: "install-harbor"
+      description: "Installs Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, and signs the harbor CLI in"
+      type: "file"
+      source: "bootstrap/01-install-harbor.sh"
+    - name: "ats-104-lab-010-02-setup"
+      description: "Creates the project team-red with the repositories app and api, tagged builds and temporary tags"
+      type: "file"
+      source: "bootstrap/02-seed-state.sh"
+testing:
+  init:
+    - name: "wait-for-harbor"
+      description: "Waits until every Harbor component reports healthy and the pods are ready"
+      type: "file"
+      source: "testing/wait-for-harbor.sh"
+    - name: "reference-solution"
+      description: "The remediation a correct learner performs; used by `astrona test`"
+      type: "file"
+      source: "solution/apply.sh"
+validation:
+  scripts:
+    - name: "validate-script-uses-cli"
+      description: "Confirms /work/promote.sh exists and uses the harbor CLI, not curl"
+      type: "file"
+      source: "validation/validate-script-uses-cli.sh"
+    - name: "validate-promote-app"
+      description: "Runs the script for team-red/app build-42 and checks the tags of the artifact"
+      type: "file"
+      source: "validation/validate-promote-app.sh"
+    - name: "validate-second-run"
+      description: "Runs the script again and checks it succeeds without changing the tags"
+      type: "file"
+      source: "validation/validate-second-run.sh"
+    - name: "validate-other-repository"
+      description: "Runs the script for team-red/api build-7 and checks the tags"
+      type: "file"
+      source: "validation/validate-other-repository.sh"
+teardown:
+  keepCluster: false
+runtime:
+  kind:
+    preloadImages:
+      - alpine:3.22
+      - docker.io/goharbor/harbor-core:v2.15.4
+      - docker.io/goharbor/harbor-db:v2.15.4
+      - docker.io/goharbor/harbor-jobservice:v2.15.4
+      - docker.io/goharbor/harbor-portal:v2.15.4
+      - docker.io/goharbor/harbor-registryctl:v2.15.4
+      - docker.io/goharbor/nginx-photon:v2.15.4
+      - docker.io/goharbor/registry-photon:v2.15.4
+      - docker.io/goharbor/trivy-adapter-photon:v2.15.4
+      - docker.io/valkey/valkey:8.1.10-alpine
+      - mendhak/http-https-echo:42
+      - python:3.13-alpine

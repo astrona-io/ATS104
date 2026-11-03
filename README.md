@@ -20,10 +20,10 @@ the part it tests, and a capstone.
 
 | Section | Title | Modules | Labs | Topic |
 | --- | --- | --- | --- | --- |
-| [010](sections/section-010) | Automating Harbor With The harbor CLI | 1 | 1 + capstone | CLI automation |
-| [020](sections/section-020) | The Harbor REST API v2.0 | 1 | 1 + capstone | REST API |
-| [030](sections/section-030) | Robot Accounts For CI | 1 | 1 + capstone | Robot accounts |
-| [040](sections/section-040) | Webhooks For Pipelines | 1 | 1 + capstone | Webhooks |
+| [010](sections/section-010) | Automating Harbor With The harbor CLI | 2 | 2 + capstone | CLI automation |
+| [020](sections/section-020) | The Harbor REST API v2.0 | 2 | 2 + capstone | REST API |
+| [030](sections/section-030) | Robot Accounts For CI | 2 | 2 + capstone | Robot accounts |
+| [040](sections/section-040) | Webhooks For Pipelines | 2 | 2 + capstone | Webhooks |
 
 The order follows a pipeline from the inside out: first a script that talks to
 Harbor, then the API under the script, then the credentials a pipeline should
@@ -35,10 +35,14 @@ use, and last the call Harbor makes back to the pipeline.
 
 | Module | Reader | Parts | Labs |
 | --- | --- | --- | --- |
-| 010-01 | [Script Harbor With The harbor CLI](sections/section-010/module-01/course.md) | 2 | [lab-01](sections/section-010/module-01/labs/lab-01) |
-| 020-01 | [Call The Harbor REST API](sections/section-020/module-01/course.md) | 3 | [lab-01](sections/section-020/module-01/labs/lab-01) |
-| 030-01 | [Give CI Its Own Credentials With Robot Accounts](sections/section-030/module-01/course.md) | 2 | [lab-01](sections/section-030/module-01/labs/lab-01) |
-| 040-01 | [Trigger Pipelines With Harbor Webhooks](sections/section-040/module-01/course.md) | 2 | [lab-01](sections/section-040/module-01/labs/lab-01) |
+| 010-01 | [Script Harbor With The harbor CLI](sections/section-010/module-01/course.md) | 4 | [lab-01](sections/section-010/module-01/labs/lab-01) |
+| 010-02 | [Projects, Repositories And Artifacts With The CLI](sections/section-010/module-02/course.md) | 4 | [lab-01](sections/section-010/module-02/labs/lab-01) |
+| 020-01 | [Call The Harbor REST API](sections/section-020/module-01/course.md) | 4 | [lab-01](sections/section-020/module-01/labs/lab-01) |
+| 020-02 | [Artifacts, Scans And The System API](sections/section-020/module-02/course.md) | 4 | [lab-01](sections/section-020/module-02/labs/lab-01) |
+| 030-01 | [Give CI Its Own Credentials With Robot Accounts](sections/section-030/module-01/course.md) | 4 | [lab-01](sections/section-030/module-01/labs/lab-01) |
+| 030-02 | [System Robots, Lifecycle And Auditing](sections/section-030/module-02/course.md) | 4 | [lab-01](sections/section-030/module-02/labs/lab-01) |
+| 040-01 | [Trigger Pipelines With Harbor Webhooks](sections/section-040/module-01/course.md) | 4 | [lab-01](sections/section-040/module-01/labs/lab-01) |
+| 040-02 | [Receivers, Events And Troubleshooting](sections/section-040/module-02/course.md) | 4 | [lab-01](sections/section-040/module-02/labs/lab-01) |
 
 ## Capstones
 

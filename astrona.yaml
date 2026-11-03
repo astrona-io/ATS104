@@ -61,6 +61,7 @@ modules:
       reusing the saved context, the encryption key, JSON output, exit codes, and
       an onboarding script that creates only what is missing, so it can run
       again safely.
+      Module 2 covers projects, repositories, artifacts, tags, retention and immutable-tag rules, and scans with the CLI.
 
     content:
       - type: reading
@@ -71,11 +72,17 @@ modules:
         title: "Script Harbor With The harbor CLI"
         path: sections/section-010/module-01/course.md
       - type: reading
-        title: "The harbor CLI In A Script"
-        path: sections/section-010/module-01/course-01-the-cli-in-a-script.md
+        title: "Contexts And The Encryption Key"
+        path: sections/section-010/module-01/course-01-contexts-and-the-encryption-key.md
+      - type: reading
+        title: "Signing In Once And Reading The Answers"
+        path: sections/section-010/module-01/course-02-signing-in-once-and-reading-the-answers.md
+      - type: reading
+        title: "Commands, Flags And Output Formats"
+        path: sections/section-010/module-01/course-03-commands-flags-and-output-formats.md
       - type: reading
         title: "An Onboarding Script That Can Run Twice"
-        path: sections/section-010/module-01/course-02-idempotent-onboarding.md
+        path: sections/section-010/module-01/course-04-idempotent-onboarding.md
       - type: reading
         title: Question
         path: sections/section-010/module-01/labs/lab-01/question.md
@@ -100,7 +107,52 @@ modules:
             url: https://goharbor.io/docs/2.15.0/working-with-projects/create-projects/add-users/
       - type: reading
         title: Summary
-        path: sections/section-010/module-01/course-03-summary.md
+        path: sections/section-010/module-01/course-05-summary.md
+
+      - type: reading
+        title: "Projects, Repositories And Artifacts With The CLI"
+        path: sections/section-010/module-02/course.md
+      - type: reading
+        title: "Projects With The CLI"
+        path: sections/section-010/module-02/course-01-projects-with-the-cli.md
+      - type: reading
+        title: "Repositories And Artifacts"
+        path: sections/section-010/module-02/course-02-repositories-and-artifacts.md
+      - type: reading
+        title: "Tags, Retention And Immutable Tags"
+        path: sections/section-010/module-02/course-03-tags-retention-and-immutable-tags.md
+      - type: reading
+        title: "Question"
+        path: sections/section-010/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Promote A Build With Tags Lab"
+        path: sections/section-010/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: cli-automation
+        task_kind: build
+        tags: [harbor-cli, artifact-tags, retention, immutable-tags, idempotency]
+        learning_goals:
+          - Add a tag to an artifact with the harbor CLI only when it is missing, and move a build from one tag to another
+          - Run the script twice without a terminal and get the same result
+          - Keep the script away from other repositories
+        resources:
+          - name: "Harbor CLI documentation"
+            url: https://goharbor.io/cli-docs/
+          - name: "harbor artifact tags create"
+            url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-artifact-tags-create.md
+          - name: "Tag retention rules"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/working-with-images/create-tag-retention-rules/
+      - type: reading
+        title: "Scans And Vulnerabilities"
+        path: sections/section-010/module-02/course-04-scans-and-vulnerabilities.md
+      - type: reading
+        title: "Summary"
+        path: sections/section-010/module-02/course-05-summary.md
+      - type: quiz
+        title: "Knowledge Check: Projects, Repositories And Artifacts With The CLI (Module 2)"
+        path: sections/section-010/module-02/quiz.yaml
+        pass_score: 70
 
       - type: reading
         title: Question
@@ -135,6 +187,7 @@ modules:
       Harbor's REST API: the base path, basic authentication, the error
       format, pages and page sizes, the q filter and sorting, and a Python
       script built only on the standard library that reads every page.
+      Module 2 covers artifact paths with double encoding, tags, copies and deletes, scans, and the system, quota, audit-log and garbage-collection endpoints.
 
     content:
       - type: reading
@@ -151,8 +204,11 @@ modules:
         title: "Pages, Filters And Sorting"
         path: sections/section-020/module-01/course-02-pages-filters-and-sorting.md
       - type: reading
+        title: "Creating, Changing And Deleting"
+        path: sections/section-020/module-01/course-03-creating-changing-and-deleting.md
+      - type: reading
         title: "A Python Script With The Standard Library"
-        path: sections/section-020/module-01/course-03-a-python-script-with-the-standard-library.md
+        path: sections/section-020/module-01/course-04-a-python-script-with-the-standard-library.md
       - type: reading
         title: Question
         path: sections/section-020/module-01/labs/lab-01/question.md
@@ -175,7 +231,50 @@ modules:
             url: https://goharbor.io/docs/2.15.0/working-with-projects/working-with-images/
       - type: reading
         title: Summary
-        path: sections/section-020/module-01/course-04-summary.md
+        path: sections/section-020/module-01/course-05-summary.md
+
+      - type: reading
+        title: "Artifacts, Scans And The System API"
+        path: sections/section-020/module-02/course.md
+      - type: reading
+        title: "Artifact Paths And Double Encoding"
+        path: sections/section-020/module-02/course-01-artifact-paths-and-double-encoding.md
+      - type: reading
+        title: "Tags, Copies And Deletes"
+        path: sections/section-020/module-02/course-02-tags-copies-and-deletes.md
+      - type: reading
+        title: "Scans And Vulnerability Reports"
+        path: sections/section-020/module-02/course-03-scans-and-vulnerability-reports.md
+      - type: reading
+        title: "System Information, Quotas, Audit Logs And Garbage Collection"
+        path: sections/section-020/module-02/course-04-system-information-quotas-audit-logs-and-garbage-collection.md
+      - type: reading
+        title: "Question"
+        path: sections/section-020/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Tag An Artifact With Python Lab"
+        path: sections/section-020/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: rest-api
+        task_kind: build
+        tags: [rest-api, python, artifacts, tags, double-encoding, idempotency]
+        learning_goals:
+          - Address an artifact whose repository name contains a slash by encoding the name twice
+          - Add a tag only when the artifact does not have it, so a second run succeeds
+          - Keep TLS verification on and read the credentials from the environment
+        resources:
+          - name: "Harbor REST API (swagger.yaml, v2.15.4)"
+            url: https://github.com/goharbor/harbor/blob/v2.15.4/api/v2.0/swagger.yaml
+          - name: "Working with images, tags and artifacts"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/working-with-images/
+      - type: reading
+        title: "Summary"
+        path: sections/section-020/module-02/course-05-summary.md
+      - type: quiz
+        title: "Knowledge Check: Artifacts, Scans And The System API (Module 2)"
+        path: sections/section-020/module-02/quiz.yaml
+        pass_score: 70
 
       - type: reading
         title: Question
@@ -209,6 +308,7 @@ modules:
       robots, the robot$ name format, permissions as resource and action,
       expiry, refreshing a secret, and storing the secret in a Kubernetes
       Secret with the smallest set of permissions that works.
+      Module 2 covers system robots, the robot lifecycle, auditing a robot, and Kubernetes image pull secrets.
 
     content:
       - type: reading
@@ -219,11 +319,14 @@ modules:
         title: "Give CI Its Own Credentials With Robot Accounts"
         path: sections/section-030/module-01/course.md
       - type: reading
-        title: "Project Robots And System Robots"
-        path: sections/section-030/module-01/course-01-project-robots-and-system-robots.md
+        title: "Robot Names, Permissions And Creation"
+        path: sections/section-030/module-01/course-01-robot-names-permissions-and-creation.md
       - type: reading
-        title: "Least Privilege, Expiry And Rotation"
-        path: sections/section-030/module-01/course-02-least-privilege-expiry-and-rotation.md
+        title: "Using A Robot"
+        path: sections/section-030/module-01/course-02-using-a-robot.md
+      - type: reading
+        title: "Least Privilege, Expiry And Secret Storage"
+        path: sections/section-030/module-01/course-03-least-privilege-expiry-and-secret-storage.md
       - type: reading
         title: Question
         path: sections/section-030/module-01/labs/lab-01/question.md
@@ -247,8 +350,54 @@ modules:
           - name: "harbor project robot create"
             url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-project-robot-create.md
       - type: reading
+        title: "Rotating A Robot Secret"
+        path: sections/section-030/module-01/course-04-rotating-a-robot-secret.md
+      - type: reading
         title: Summary
-        path: sections/section-030/module-01/course-03-summary.md
+        path: sections/section-030/module-01/course-05-summary.md
+
+      - type: reading
+        title: "System Robots, Lifecycle And Auditing"
+        path: sections/section-030/module-02/course.md
+      - type: reading
+        title: "System Robots And Their Permissions"
+        path: sections/section-030/module-02/course-01-system-robots-and-their-permissions.md
+      - type: reading
+        title: "The Lifecycle Of A Robot"
+        path: sections/section-030/module-02/course-02-the-lifecycle-of-a-robot.md
+      - type: reading
+        title: "Auditing What A Robot Did"
+        path: sections/section-030/module-02/course-03-auditing-what-a-robot-did.md
+      - type: reading
+        title: "Robots In Pipelines And Kubernetes Pull Secrets"
+        path: sections/section-030/module-02/course-04-robots-in-pipelines-and-kubernetes-pull-secrets.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Create A System Robot For Two Teams Lab"
+        path: sections/section-030/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: robot-accounts
+        task_kind: build
+        tags: [robot-accounts, system-robot, least-privilege, kubernetes-secret, expiry]
+        learning_goals:
+          - Create one system robot with pull access to two projects and no other permission
+          - Give it a 30-day lifetime and store its credentials in a Kubernetes Secret
+          - Prove it cannot pull from a third project or push
+        resources:
+          - name: "Robot accounts (system level)"
+            url: https://goharbor.io/docs/2.15.0/administration/robot-accounts/
+          - name: "Harbor REST API (swagger.yaml, v2.15.4)"
+            url: https://github.com/goharbor/harbor/blob/v2.15.4/api/v2.0/swagger.yaml
+      - type: reading
+        title: "Summary"
+        path: sections/section-030/module-02/course-05-summary.md
+      - type: quiz
+        title: "Knowledge Check: System Robots, Lifecycle And Auditing (Module 2)"
+        path: sections/section-030/module-02/quiz.yaml
+        pass_score: 70
 
       - type: reading
         title: Question
@@ -284,6 +433,7 @@ modules:
       project: event types, the Default and CloudEvents payloads, the auth
       header, delivery by jobservice with retries, the execution log, and how
       GitHub Actions and Jenkins receive the call.
+      Module 2 covers event types, managing policies through the REST API, writing a receiver, and troubleshooting a missing webhook.
 
     content:
       - type: reading
@@ -294,11 +444,8 @@ modules:
         title: "Trigger Pipelines With Harbor Webhooks"
         path: sections/section-040/module-01/course.md
       - type: reading
-        title: "Webhook Policies And Payloads"
-        path: sections/section-040/module-01/course-01-webhook-policies-and-payloads.md
-      - type: reading
-        title: "Delivery, Retries And CI Integration"
-        path: sections/section-040/module-01/course-02-delivery-retries-and-ci-integration.md
+        title: "Webhook Policies And The Default Payload"
+        path: sections/section-040/module-01/course-01-webhook-policies-and-the-default-payload.md
       - type: reading
         title: Question
         path: sections/section-040/module-01/labs/lab-01/question.md
@@ -319,8 +466,60 @@ modules:
           - name: "harbor webhook create"
             url: https://github.com/goharbor/harbor-cli/blob/v0.0.27/doc/cli-docs/harbor-webhook-create.md
       - type: reading
+        title: "The CloudEvents Payload"
+        path: sections/section-040/module-01/course-02-the-cloudevents-payload.md
+      - type: reading
+        title: "Reading A Failed Delivery"
+        path: sections/section-040/module-01/course-03-reading-a-failed-delivery.md
+      - type: reading
+        title: "Retries, Receivers And CI Systems"
+        path: sections/section-040/module-01/course-04-retries-receivers-and-ci-systems.md
+      - type: reading
         title: Summary
-        path: sections/section-040/module-01/course-03-summary.md
+        path: sections/section-040/module-01/course-05-summary.md
+
+      - type: reading
+        title: "Receivers, Events And Troubleshooting"
+        path: sections/section-040/module-02/course.md
+      - type: reading
+        title: "Event Types And Policy Design"
+        path: sections/section-040/module-02/course-01-event-types-and-policy-design.md
+      - type: reading
+        title: "Managing Policies With The REST API"
+        path: sections/section-040/module-02/course-02-managing-policies-with-the-rest-api.md
+      - type: reading
+        title: "Writing A Receiver"
+        path: sections/section-040/module-02/course-03-writing-a-receiver.md
+      - type: reading
+        title: "Troubleshooting A Webhook That Does Not Arrive"
+        path: sections/section-040/module-02/course-04-troubleshooting-a-webhook-that-does-not-arrive.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Audit Deleted Artifacts With A CloudEvents Webhook Lab"
+        path: sections/section-040/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: webhooks
+        task_kind: build
+        tags: [webhooks, cloudevents, delete-artifact, auth-header, receiver]
+        learning_goals:
+          - Create a webhook policy that fires on DELETE_ARTIFACT only and sends CloudEvents with an auth header
+          - Delete an artifact and prove the receiver logged a harbor.artifact.deleted event
+          - Keep the policy enabled and limited to one event type
+        resources:
+          - name: "Configure webhook notifications"
+            url: https://goharbor.io/docs/2.15.0/working-with-projects/project-configuration/configure-webhooks/
+          - name: "Harbor REST API (swagger.yaml, v2.15.4)"
+            url: https://github.com/goharbor/harbor/blob/v2.15.4/api/v2.0/swagger.yaml
+      - type: reading
+        title: "Summary"
+        path: sections/section-040/module-02/course-05-summary.md
+      - type: quiz
+        title: "Knowledge Check: Receivers, Events And Troubleshooting (Module 2)"
+        path: sections/section-040/module-02/quiz.yaml
+        pass_score: 70
 
       - type: reading
         title: Question

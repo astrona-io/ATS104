@@ -1,0 +1,34 @@
+# Helm values for Harbor 2.15.4 (chart harbor-helm 1.19.4) in every ATS100
+# environment. One address everywhere: https://harbor.localtest.me:8443.
+# Inside the cluster a CoreDNS rewrite sends that name to the Service
+# `harbor`; on the reader's machine a port-forward of port 8443 does.
+expose:
+  type: clusterIP
+  tls:
+    enabled: true
+    certSource: auto
+    auto:
+      commonName: harbor.localtest.me
+  clusterIP:
+    name: harbor
+    ports:
+      httpPort: 8080
+      httpsPort: 8443
+externalURL: https://harbor.localtest.me:8443
+# Lab-only administrator password. A real installation sets its own.
+harborAdminPassword: Harbor12345
+# Lab environments are thrown away: no PersistentVolumeClaims.
+persistence:
+  enabled: false
+trivy:
+  enabled: true
+metrics:
+  enabled: false
+# Harbor publishes its images for amd64 only. On an arm64 machine (Apple
+# silicon) they run under emulation, and the bundled Valkey (Redis) crashes
+# there. The official Valkey image is multi-architecture and replaces it.
+redis:
+  internal:
+    image:
+      repository: docker.io/valkey/valkey
+      tag: 8.1.10-alpine

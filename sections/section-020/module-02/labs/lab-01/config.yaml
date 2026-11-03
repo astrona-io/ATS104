@@ -1,0 +1,66 @@
+# Tag An Artifact With Python
+# Astrona graded lab. Schema: internal/config.LabConfig.
+
+metadata:
+  name: "ats-104-lab-020-02"
+  docs:
+    guide: "solution.md"
+    solution: "solution.md"
+    question: "question.md"
+    examQuestion: "question.md"
+    prerequisites: "prerequisites.md"
+bootstrap:
+  init:
+    - name: "install-harbor"
+      description: "Installs Harbor 2.15.4 with Helm, the workstation and python-runner pods and the webhook receiver, and signs the harbor CLI in"
+      type: "file"
+      source: "bootstrap/01-install-harbor.sh"
+    - name: "ats-104-lab-020-02-setup"
+      description: "Creates the project inventory with the repositories web/frontend and web/backend, each with the tag v1"
+      type: "file"
+      source: "bootstrap/02-seed-state.sh"
+testing:
+  init:
+    - name: "wait-for-harbor"
+      description: "Waits until every Harbor component reports healthy and the pods are ready"
+      type: "file"
+      source: "testing/wait-for-harbor.sh"
+    - name: "reference-solution"
+      description: "The remediation a correct learner performs; used by `astrona test`"
+      type: "file"
+      source: "solution/apply.sh"
+validation:
+  scripts:
+    - name: "validate-script-is-safe"
+      description: "Confirms /work/tag_artifact.py exists, verifies TLS and holds no password"
+      type: "file"
+      source: "validation/validate-script-is-safe.sh"
+    - name: "validate-tag-frontend"
+      description: "Runs the script for web/frontend and checks that the artifact has the tag release"
+      type: "file"
+      source: "validation/validate-tag-frontend.sh"
+    - name: "validate-second-run"
+      description: "Runs the script a second time and checks that it succeeds without an error"
+      type: "file"
+      source: "validation/validate-second-run.sh"
+    - name: "validate-tag-backend"
+      description: "Runs the script for web/backend and checks the report and the tags"
+      type: "file"
+      source: "validation/validate-tag-backend.sh"
+teardown:
+  keepCluster: false
+runtime:
+  kind:
+    preloadImages:
+      - alpine:3.22
+      - docker.io/goharbor/harbor-core:v2.15.4
+      - docker.io/goharbor/harbor-db:v2.15.4
+      - docker.io/goharbor/harbor-jobservice:v2.15.4
+      - docker.io/goharbor/harbor-portal:v2.15.4
+      - docker.io/goharbor/harbor-registryctl:v2.15.4
+      - docker.io/goharbor/nginx-photon:v2.15.4
+      - docker.io/goharbor/registry-photon:v2.15.4
+      - docker.io/goharbor/trivy-adapter-photon:v2.15.4
+      - docker.io/valkey/valkey:8.1.10-alpine
+      - mendhak/http-https-echo:42
+      - python:3.13-alpine

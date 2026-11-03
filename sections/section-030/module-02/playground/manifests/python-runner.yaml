@@ -1,0 +1,40 @@
+# Runs the Python automation scripts. Standard library only: no pip install.
+# Harbor's CA comes from the ConfigMap harbor-ca and the lab-only API
+# credentials from the Secret harbor-api, both created by the bootstrap script.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-runner
+  namespace: workstation
+  labels:
+    app: python-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-runner
+  template:
+    metadata:
+      labels:
+        app: python-runner
+    spec:
+      containers:
+        - name: python
+          image: python:3.13-alpine
+          command: ["sh", "-c", "mkdir -p /work && while true; do sleep 30; done"]
+          env:
+            - name: HARBOR_URL
+              value: https://harbor.localtest.me:8443
+            - name: HARBOR_CA
+              value: /etc/harbor-ca/ca.crt
+          envFrom:
+            - secretRef:
+                name: harbor-api
+          volumeMounts:
+            - name: harbor-ca
+              mountPath: /etc/harbor-ca
+              readOnly: true
+      volumes:
+        - name: harbor-ca
+          configMap:
+            name: harbor-ca
