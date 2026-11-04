@@ -13,7 +13,7 @@
 training:
   id: ATS104
   title: "Harbor: Harbor CLI Automation, REST API & Webhooks"
-  maturity: draft
+  maturity: alpha
   description: >
     Training material covering the Harbor CLI Automation, REST API & Webhooks
     domain of the Harbor training path: scripting Harbor with the harbor
